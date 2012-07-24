@@ -8,7 +8,7 @@ class AllTheThings.Widget extends Batman.View
     @mixin(AllTheThings.lastEvents[@id]) # in case the events from the server came before the widget was rendered
 
     type = Batman.Filters.underscore(@view)
-    $(@node).addClass("widget #{type} #{@id}")
+    $(@node).addClass("widget widget-#{type} #{@id}")
 
   onData: (data) =>
     @mixin(data)
