@@ -1,0 +1,66 @@
+#!/usr/bin/env ruby
+
+require 'thor'
+require 'net/http'
+require 'json'
+
+class MockScheduler
+  def method_missing(*args)
+    yield
+  end
+end
+
+def send_event(id, data)
+  req = Net::HTTP::Post.new("/widgets/#{id}")
+  req["content-type"] = "application/json"
+  req.body = JSON.unparse(data.merge(:auth_token => AllTheThings::CLI.auth_token))
+  res = Net::HTTP.new('localhost', 3000).start { |http| http.request(req) }
+  puts "Data Sent to #{id}: #{data}"
+end
+
+SCHEDULER = MockScheduler.new
+
+module AllTheThings
+
+  class CLI < Thor
+    include Thor::Actions
+
+    class << self
+      attr_accessor :auth_token
+    end
+
+    attr_accessor :name
+
+    def self.source_root
+      File.expand_path('../../templates', __FILE__)
+    end
+
+    desc "install PROJECT_NAME", "Sets up ALL THE THINGS needed for your dashboard project structure."
+    def install(name)
+      @name = Thor::Util.snake_case(name)
+      directory :project, @name
+    end
+
+    desc "new_widget WIDGET_NAME", "Creates a new widget with all the fixins'"
+    def new_widget(name)
+      @name = Thor::Util.snake_case(name)
+      directory :widget, File.join('widgets', @name)
+    end 
+
+    desc "start", "Starts the server in style!"
+    def start(*args)
+      args = args.join(" ")
+      system("bundle exec thin -R config.ru start #{args}")
+    end
+
+    desc "job JOB_NAME AUTH_TOKEN(optional)", "Runs the specified job."
+    def job(name, auth_token = "")
+      self.class.auth_token = auth_token
+      f = File.join(Dir.pwd, "jobs", "#{name}.rb")
+      require f
+    end
+  
+  end
+end
+
+AllTheThings::CLI.start
