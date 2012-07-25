@@ -43,7 +43,7 @@ module AllTheThings
 
     desc "new_widget WIDGET_NAME", "Creates a new widget with all the fixins'"
     def new_widget(name)
-      @name = Thor::Util.snake_case(name)
+      @name = "widget_#{Thor::Util.snake_case(name)}"
       directory :widget, File.join('widgets', @name)
     end 
 
