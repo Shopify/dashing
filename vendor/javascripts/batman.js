@@ -3812,7 +3812,7 @@
         path = this.pathFromValue(value);
       }
       if (this.onATag) {
-        if (path != null) {
+        if ((path != null) && (Batman.navigator != null)) {
           path = Batman.navigator.linkTo(path);
         } else {
           path = "#";
@@ -3850,20 +3850,28 @@
       return RadioBinding.__super__.constructor.apply(this, arguments);
     }
 
-    RadioBinding.prototype.isInputBinding = true;
+    RadioBinding.accessor('parsedNodeValue', function() {
+      return Batman.DOM.attrReaders._parseAttribute(this.node.value);
+    });
+
+    RadioBinding.prototype.firstBind = true;
 
     RadioBinding.prototype.dataChange = function(value) {
       var boundValue;
-      if ((boundValue = this.get('filteredValue')) != null) {
-        return this.node.checked = boundValue === this.node.value;
-      } else if (this.node.checked) {
-        return this.set('filteredValue', this.node.value);
+      boundValue = this.get('filteredValue');
+      if (boundValue != null) {
+        this.node.checked = boundValue === Batman.DOM.attrReaders._parseAttribute(this.node.value);
+      } else {
+        if (this.firstBind && this.node.checked) {
+          this.set('filteredValue', this.get('parsedNodeValue'));
+        }
       }
+      return this.firstBind = false;
     };
 
     RadioBinding.prototype.nodeChange = function(node) {
       if (this.isTwoWay()) {
-        return this.set('filteredValue', Batman.DOM.attrReaders._parseAttribute(node.value));
+        return this.set('filteredValue', this.get('parsedNodeValue'));
       }
     };
 
@@ -5801,11 +5809,10 @@
     };
 
     Model.encode = function() {
-      var encoder, encoderOrLastKey, hash, key, keys, operation, _base, _base1, _i, _j, _k, _len, _len1, _ref;
+      var encoder, encoderForKey, encoderOrLastKey, key, keys, _base, _i, _j, _len;
       keys = 2 <= arguments.length ? __slice.call(arguments, 0, _i = arguments.length - 1) : (_i = 0, []), encoderOrLastKey = arguments[_i++];
       Batman.initializeObject(this.prototype);
       (_base = this.prototype._batman).encoders || (_base.encoders = new Batman.SimpleHash);
-      (_base1 = this.prototype._batman).decoders || (_base1.decoders = new Batman.SimpleHash);
       encoder = {};
       switch (Batman.typeOf(encoderOrLastKey)) {
         case 'String':
@@ -5815,26 +5822,14 @@
           encoder.encode = encoderOrLastKey;
           break;
         default:
-          if (encoderOrLastKey.encode != null) {
-            encoder.encode = encoderOrLastKey.encode;
-          }
-          if (encoderOrLastKey.decode != null) {
-            encoder.decode = encoderOrLastKey.decode;
-          }
+          encoder = encoderOrLastKey;
       }
-      encoder = Batman.extend({}, this.defaultEncoder, encoder);
-      _ref = ['encode', 'decode'];
-      for (_j = 0, _len = _ref.length; _j < _len; _j++) {
-        operation = _ref[_j];
-        for (_k = 0, _len1 = keys.length; _k < _len1; _k++) {
-          key = keys[_k];
-          hash = this.prototype._batman["" + operation + "rs"];
-          if (encoder[operation]) {
-            hash.set(key, encoder[operation]);
-          } else {
-            hash.unset(key);
-          }
-        }
+      for (_j = 0, _len = keys.length; _j < _len; _j++) {
+        key = keys[_j];
+        encoderForKey = Batman.extend({
+          as: key
+        }, this.defaultEncoder, encoder);
+        this.prototype._batman.encoders.set(key, encoderForKey);
       }
     };
 
@@ -6245,11 +6240,13 @@
       if (!(!encoders || encoders.isEmpty())) {
         encoders.forEach(function(key, encoder) {
           var encodedVal, val;
-          val = _this.get(key);
-          if (typeof val !== 'undefined') {
-            encodedVal = encoder(val, key, obj, _this);
-            if (typeof encodedVal !== 'undefined') {
-              return obj[key] = encodedVal;
+          if (encoder.encode) {
+            val = _this.get(key);
+            if (typeof val !== 'undefined') {
+              encodedVal = encoder.encode(val, key, obj, _this);
+              if (typeof encodedVal !== 'undefined') {
+                return obj[encoder.as] = encodedVal;
+              }
             }
           }
         });
@@ -6258,19 +6255,21 @@
     };
 
     Model.prototype.fromJSON = function(data) {
-      var decoders, key, obj, value,
+      var encoders, key, obj, value,
         _this = this;
       obj = {};
-      decoders = this._batman.get('decoders');
-      if (!decoders || decoders.isEmpty()) {
+      encoders = this._batman.get('encoders');
+      if (!encoders || encoders.isEmpty() || !encoders.some(function(key, encoder) {
+        return encoder.decode != null;
+      })) {
         for (key in data) {
           value = data[key];
           obj[key] = value;
         }
       } else {
-        decoders.forEach(function(key, decoder) {
-          if (typeof data[key] !== 'undefined') {
-            return obj[key] = decoder(data[key], key, data, obj, _this);
+        encoders.forEach(function(key, encoder) {
+          if (encoder.decode && typeof data[encoder.as] !== 'undefined') {
+            return obj[key] = encoder.decode(data[encoder.as], encoder.as, data, obj, _this);
           }
         });
       }
@@ -6278,7 +6277,7 @@
         obj.id = data[this.constructor.primaryKey];
       }
       Batman.developer["do"](function() {
-        if ((!decoders) || decoders.length <= 1) {
+        if ((!encoders) || encoders.length <= 1) {
           return Batman.developer.warn("Warning: Model " + (Batman.functionName(_this.constructor)) + " has suspiciously few decoders!");
         }
       });
@@ -6906,7 +6905,9 @@
       queryParam: '(?:\\?.+)?',
       namedOrSplat: /[:|\*]([\w\d]+)/g,
       namePrefix: '[:|\*]',
-      escapeRegExp: /[-[\]{}()+?.,\\^$|#\s]/g
+      escapeRegExp: /[-[\]{}+?.,\\^$|#\s]/g,
+      openOptParam: /\(/g,
+      closeOptParam: /\)/g
     };
 
     Route.prototype.optionKeys = ['member', 'collection'];
@@ -6922,7 +6923,7 @@
         templatePath = "/" + templatePath;
       }
       pattern = templatePath.replace(regexps.escapeRegExp, '\\$&');
-      regexp = RegExp("^" + (pattern.replace(regexps.namedParam, '([^\/]+)').replace(regexps.splatParam, '(.*?)')) + regexps.queryParam + "$");
+      regexp = RegExp("^" + (pattern.replace(regexps.openOptParam, '(?:').replace(regexps.closeOptParam, ')?').replace(regexps.namedParam, '([^\/]+)').replace(regexps.splatParam, '(.*?)')) + regexps.queryParam + "$");
       namedArguments = ((function() {
         var _results;
         _results = [];
@@ -6964,19 +6965,21 @@
     };
 
     Route.prototype.pathFromParams = function(argumentParams) {
-      var hash, key, name, newPath, params, path, query, regexp, _i, _j, _len, _len1, _ref, _ref1;
+      var hash, key, name, newPath, params, path, query, regexp, regexps, _i, _j, _len, _len1, _ref, _ref1;
       params = Batman.extend({}, argumentParams);
       path = this.get('templatePath');
+      regexps = this.constructor.regexps;
       _ref = this.get('namedArguments');
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         name = _ref[_i];
-        regexp = RegExp("" + this.constructor.regexps.namePrefix + name);
+        regexp = RegExp("" + regexps.namePrefix + name);
         newPath = path.replace(regexp, (params[name] != null ? params[name] : ''));
         if (newPath !== path) {
           delete params[name];
           path = newPath;
         }
       }
+      path = path.replace(regexps.openOptParam, '').replace(regexps.closeOptParam, '').replace(/([^\/])\/+$/, '$1');
       _ref1 = this.testKeys;
       for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
         key = _ref1[_j];
@@ -7542,7 +7545,7 @@
       frame = this._actionFrames[this._actionFrames.length - 1];
       if (frame) {
         if (frame.operationOccurred) {
-          Batman.developer.warn("Warning! Trying to redirect but an action has already be taken during " + (this.get('routingKey')) + "." + (frame.action || this.get('action')));
+          Batman.developer.warn("Warning! Trying to redirect but an action has already been taken during " + (this.get('routingKey')) + "." + (frame.action || this.get('action')));
         }
         frame.startAndFinishOperation();
         if (this._afterFilterRedirect != null) {
@@ -8375,7 +8378,7 @@
       this.foreignKeyValue = foreignKeyValue;
       this.association = association;
       base = new Batman.Set;
-      AssociationSet.__super__.constructor.call(this, base, 'hashKey');
+      AssociationSet.__super__.constructor.call(this, base, '_batmanID');
     }
 
     AssociationSet.prototype.loaded = false;
@@ -8585,7 +8588,7 @@
     PolymorphicAssociationSetIndex.prototype._resultSetForKey = function(key) {
       var _this = this;
       return this._storage.getOrSet(key, function() {
-        return new Batman.PolymorphicAssociationSet(key, _this.type, _this.association);
+        return new _this.association.proxyClass(key, _this.type, _this.association);
       });
     };
 
@@ -8611,7 +8614,7 @@
     AssociationSetIndex.prototype._resultSetForKey = function(key) {
       var _this = this;
       return this._storage.getOrSet(key, function() {
-        return new Batman.AssociationSet(key, _this.association);
+        return new _this.association.proxyClass(key, _this.association);
       });
     };
 
@@ -8952,7 +8955,7 @@
                 return acc.concat(pairForList("" + key + "[]", element));
               }, []);
             default:
-              return [[key, object]];
+              return [[key, object != null ? object : ""]];
           }
         })();
       };
@@ -9863,11 +9866,20 @@
         name: Batman.helpers.camelize(Batman.helpers.singularize(this.label))
       };
       this.options = Batman.extend(defaultOptions, this.defaultOptions, options);
-      encoder = this.encoder();
-      if (!this.options.saveInline) {
-        encoder.encode = false;
+      if (this.options.nestUrl) {
+        if (!(this.model.urlNestsUnder != null)) {
+          developer.error("You must persist the the model " + this.model.constructor.name + " to use the url helpers on an association");
+        }
+        this.model.urlNestsUnder(Batman.helpers.underscore(this.getRelatedModel().get('resourceName')));
       }
-      this.model.encode(label, encoder);
+      if (this.options.extend != null) {
+        Batman.extend(this, this.options.extend);
+      }
+      encoder = {
+        encode: this.options.saveInline ? this.encoder() : false,
+        decode: this.decoder()
+      };
+      this.model.encode(this.label, encoder);
       self = this;
       getAccessor = function() {
         return self.getAccessor.call(this, self, this.model, this.label);
@@ -9877,12 +9889,6 @@
         set: model.defaultAccessor.set,
         unset: model.defaultAccessor.unset
       });
-      if (this.options.nestUrl) {
-        if (!(this.model.urlNestsUnder != null)) {
-          developer.error("You must persist the the model " + this.model.constructor.name + " to use the url helpers on an association");
-        }
-        this.model.urlNestsUnder(Batman.helpers.underscore(this.getRelatedModel().get('resourceName')));
-      }
     }
 
     Association.prototype.getRelatedModel = function() {
@@ -9904,14 +9910,6 @@
 
     Association.prototype.setIntoAttributes = function(record, value) {
       return record.get('attributes').set(this.label, value);
-    };
-
-    Association.prototype.encoder = function() {
-      return Batman.developer.error("You must override encoder in Batman.Association subclasses.");
-    };
-
-    Association.prototype.setIndex = function() {
-      return Batman.developer.error("You must override setIndex in Batman.Association subclasses.");
     };
 
     Association.prototype.inverse = function() {
@@ -9954,6 +9952,8 @@
       return PluralAssociation.__super__.constructor.apply(this, arguments);
     }
 
+    PluralAssociation.prototype.proxyClass = Batman.AssociationSet;
+
     PluralAssociation.prototype.isSingular = false;
 
     PluralAssociation.prototype.setForRecord = Batman.Property.wrapTrackingPrevention(function(record) {
@@ -9961,7 +9961,7 @@
       if (id = record.get(this.primaryKey)) {
         return this.setIndex().get(id);
       } else {
-        return new Batman.AssociationSet(void 0, this);
+        return new this.proxyClass(void 0, this);
       }
     });
 
@@ -10044,65 +10044,65 @@
     HasManyAssociation.prototype.encoder = function() {
       var association;
       association = this;
-      return {
-        encode: function(relationSet, _, __, record) {
-          var jsonArray;
-          if (!association.options.saveInline) {
-            return;
-          }
-          if (relationSet != null) {
-            jsonArray = [];
-            relationSet.forEach(function(relation) {
-              var relationJSON;
-              relationJSON = relation.toJSON();
-              if (!association.inverse() || association.inverse().options.encodeForeignKey) {
-                relationJSON[association.foreignKey] = record.get(association.primaryKey);
-              }
-              return jsonArray.push(relationJSON);
+      return function(relationSet, _, __, record) {
+        var jsonArray;
+        if (relationSet != null) {
+          jsonArray = [];
+          relationSet.forEach(function(relation) {
+            var relationJSON;
+            relationJSON = relation.toJSON();
+            if (!association.inverse() || association.inverse().options.encodeForeignKey) {
+              relationJSON[association.foreignKey] = record.get(association.primaryKey);
+            }
+            return jsonArray.push(relationJSON);
+          });
+        }
+        return jsonArray;
+      };
+    };
+
+    HasManyAssociation.prototype.decoder = function() {
+      var association;
+      association = this;
+      return function(data, key, _, __, parentRecord) {
+        var existingRecord, existingRelations, jsonObject, newRelations, record, relatedModel, savedRecord, _i, _len;
+        if (relatedModel = association.getRelatedModel()) {
+          existingRelations = association.getFromAttributes(parentRecord) || association.setForRecord(parentRecord);
+          newRelations = existingRelations.filter(function(relation) {
+            return relation.isNew();
+          }).toArray();
+          for (_i = 0, _len = data.length; _i < _len; _i++) {
+            jsonObject = data[_i];
+            record = new relatedModel();
+            record._withoutDirtyTracking(function() {
+              return this.fromJSON(jsonObject);
             });
-          }
-          return jsonArray;
-        },
-        decode: function(data, key, _, __, parentRecord) {
-          var existingRecord, existingRelations, jsonObject, newRelations, record, relatedModel, savedRecord, _i, _len;
-          if (relatedModel = association.getRelatedModel()) {
-            existingRelations = association.getFromAttributes(parentRecord) || association.setForRecord(parentRecord);
-            newRelations = existingRelations.filter(function(relation) {
-              return relation.isNew();
-            }).toArray();
-            for (_i = 0, _len = data.length; _i < _len; _i++) {
-              jsonObject = data[_i];
-              record = new relatedModel();
-              record._withoutDirtyTracking(function() {
+            existingRecord = relatedModel.get('loaded').indexedByUnique('id').get(record.get('id'));
+            if (existingRecord != null) {
+              existingRecord._withoutDirtyTracking(function() {
                 return this.fromJSON(jsonObject);
               });
-              existingRecord = relatedModel.get('loaded').indexedByUnique('id').get(record.get('id'));
-              if (existingRecord != null) {
-                existingRecord._withoutDirtyTracking(function() {
+              record = existingRecord;
+            } else {
+              if (newRelations.length > 0) {
+                savedRecord = newRelations.shift();
+                savedRecord._withoutDirtyTracking(function() {
                   return this.fromJSON(jsonObject);
                 });
-                record = existingRecord;
-              } else {
-                if (newRelations.length > 0) {
-                  savedRecord = newRelations.shift();
-                  savedRecord._withoutDirtyTracking(function() {
-                    return this.fromJSON(jsonObject);
-                  });
-                  record = savedRecord;
-                }
-              }
-              record = relatedModel._mapIdentity(record);
-              existingRelations.add(record);
-              if (association.options.inverseOf) {
-                record.set(association.options.inverseOf, parentRecord);
+                record = savedRecord;
               }
             }
-            existingRelations.markAsLoaded();
-          } else {
-            Batman.developer.error("Can't decode model " + association.options.name + " because it hasn't been loaded yet!");
+            record = relatedModel._mapIdentity(record);
+            existingRelations.add(record);
+            if (association.options.inverseOf) {
+              record.set(association.options.inverseOf, parentRecord);
+            }
           }
-          return existingRelations;
+          existingRelations.markAsLoaded();
+        } else {
+          Batman.developer.error("Can't decode model " + association.options.name + " because it hasn't been loaded yet!");
         }
+        return existingRelations;
       };
     };
 
@@ -10119,6 +10119,8 @@
   Batman.PolymorphicHasManyAssociation = (function(_super) {
 
     __extends(PolymorphicHasManyAssociation, _super);
+
+    PolymorphicHasManyAssociation.prototype.proxyClass = Batman.PolymorphicAssociationSet;
 
     PolymorphicHasManyAssociation.prototype.isPolymorphic = true;
 
@@ -10161,18 +10163,10 @@
     };
 
     PolymorphicHasManyAssociation.prototype.encoder = function() {
-      var association, encoder;
+      var association;
       association = this;
-      encoder = PolymorphicHasManyAssociation.__super__.encoder.apply(this, arguments);
-      encoder.encode = function(relationSet, _, __, record) {
+      return function(relationSet, _, __, record) {
         var jsonArray;
-        if (association._beingEncoded) {
-          return;
-        }
-        association._beingEncoded = true;
-        if (!association.options.saveInline) {
-          return;
-        }
         if (relationSet != null) {
           jsonArray = [];
           relationSet.forEach(function(relation) {
@@ -10183,10 +10177,8 @@
             return jsonArray.push(relationJSON);
           });
         }
-        delete association._beingEncoded;
         return jsonArray;
       };
-      return encoder;
     };
 
     return PolymorphicHasManyAssociation;
@@ -10266,30 +10258,33 @@
     HasOneAssociation.prototype.encoder = function() {
       var association;
       association = this;
-      return {
-        encode: function(val, key, object, record) {
-          var json;
-          if (!association.options.saveInline) {
-            return;
-          }
-          if (json = val.toJSON()) {
-            json[association.foreignKey] = record.get(association.primaryKey);
-          }
-          return json;
-        },
-        decode: function(data, _, __, ___, parentRecord) {
-          var record, relatedModel;
-          relatedModel = association.getRelatedModel();
-          record = new relatedModel();
-          record._withoutDirtyTracking(function() {
-            return this.fromJSON(data);
-          });
-          if (association.options.inverseOf) {
-            record.set(association.options.inverseOf, parentRecord);
-          }
-          record = relatedModel._mapIdentity(record);
-          return record;
+      return function(val, key, object, record) {
+        var json;
+        if (!association.options.saveInline) {
+          return;
         }
+        if (json = val.toJSON()) {
+          json[association.foreignKey] = record.get(association.primaryKey);
+        }
+        return json;
+      };
+    };
+
+    HasOneAssociation.prototype.decoder = function() {
+      var association;
+      association = this;
+      return function(data, _, __, ___, parentRecord) {
+        var record, relatedModel;
+        relatedModel = association.getRelatedModel();
+        record = new relatedModel();
+        record._withoutDirtyTracking(function() {
+          return this.fromJSON(data);
+        });
+        if (association.options.inverseOf) {
+          record.set(association.options.inverseOf, parentRecord);
+        }
+        record = relatedModel._mapIdentity(record);
+        return record;
       };
     };
 
@@ -10337,37 +10332,34 @@
     }
 
     BelongsToAssociation.prototype.encoder = function() {
-      var association, encoder;
+      return function(val) {
+        return val.toJSON();
+      };
+    };
+
+    BelongsToAssociation.prototype.decoder = function() {
+      var association;
       association = this;
-      encoder = {
-        encode: false,
-        decode: function(data, _, __, ___, childRecord) {
-          var inverse, record, relatedModel;
-          relatedModel = association.getRelatedModel();
-          record = new relatedModel();
-          record._withoutDirtyTracking(function() {
-            return this.fromJSON(data);
-          });
-          record = relatedModel._mapIdentity(record);
-          if (association.options.inverseOf) {
-            if (inverse = association.inverse()) {
-              if (inverse instanceof Batman.HasManyAssociation) {
-                childRecord.set(association.foreignKey, record.get(association.primaryKey));
-              } else {
-                record.set(inverse.label, childRecord);
-              }
+      return function(data, _, __, ___, childRecord) {
+        var inverse, record, relatedModel;
+        relatedModel = association.getRelatedModel();
+        record = new relatedModel();
+        record._withoutDirtyTracking(function() {
+          return this.fromJSON(data);
+        });
+        record = relatedModel._mapIdentity(record);
+        if (association.options.inverseOf) {
+          if (inverse = association.inverse()) {
+            if (inverse instanceof Batman.HasManyAssociation) {
+              childRecord.set(association.foreignKey, record.get(association.primaryKey));
+            } else {
+              record.set(inverse.label, childRecord);
             }
           }
-          childRecord.set(association.label, record);
-          return record;
         }
+        childRecord.set(association.label, record);
+        return record;
       };
-      if (this.options.saveInline) {
-        encoder.encode = function(val) {
-          return val.toJSON();
-        };
-      }
-      return encoder;
     };
 
     BelongsToAssociation.prototype.apply = function(base) {
@@ -10468,7 +10460,7 @@
       }
       Batman.developer["do"](function() {
         if ((Batman.currentApp != null) && !relatedModel) {
-          return Batman.developer.warn("Related model " + type + " for polymorhic association not found.");
+          return Batman.developer.warn("Related model " + type + " for polymorphic association not found.");
         }
       });
       return relatedModel;
@@ -10497,40 +10489,31 @@
       }
     };
 
-    PolymorphicBelongsToAssociation.prototype.encoder = function() {
-      var association, encoder;
+    PolymorphicBelongsToAssociation.prototype.decoder = function() {
+      var association;
       association = this;
-      encoder = {
-        encode: false,
-        decode: function(data, key, response, ___, childRecord) {
-          var foreignTypeValue, inverse, record, relatedModel;
-          foreignTypeValue = response[association.foreignTypeKey] || childRecord.get(association.foreignTypeKey);
-          relatedModel = association.getRelatedModelForType(foreignTypeValue);
-          record = new relatedModel();
-          record._withoutDirtyTracking(function() {
-            return this.fromJSON(data);
-          });
-          record = relatedModel._mapIdentity(record);
-          if (association.options.inverseOf) {
-            if (inverse = association.inverseForType(foreignTypeValue)) {
-              if (inverse instanceof Batman.PolymorphicHasManyAssociation) {
-                childRecord.set(association.foreignKey, record.get(association.primaryKey));
-                childRecord.set(association.foreignTypeKey, foreignTypeValue);
-              } else {
-                record.set(inverse.label, childRecord);
-              }
+      return function(data, key, response, ___, childRecord) {
+        var foreignTypeValue, inverse, record, relatedModel;
+        foreignTypeValue = response[association.foreignTypeKey] || childRecord.get(association.foreignTypeKey);
+        relatedModel = association.getRelatedModelForType(foreignTypeValue);
+        record = new relatedModel();
+        record._withoutDirtyTracking(function() {
+          return this.fromJSON(data);
+        });
+        record = relatedModel._mapIdentity(record);
+        if (association.options.inverseOf) {
+          if (inverse = association.inverseForType(foreignTypeValue)) {
+            if (inverse instanceof Batman.PolymorphicHasManyAssociation) {
+              childRecord.set(association.foreignKey, record.get(association.primaryKey));
+              childRecord.set(association.foreignTypeKey, foreignTypeValue);
+            } else {
+              record.set(inverse.label, childRecord);
             }
           }
-          childRecord.set(association.label, record);
-          return record;
         }
+        childRecord.set(association.label, record);
+        return record;
       };
-      if (this.options.saveInline) {
-        encoder.encode = function(val) {
-          return val.toJSON();
-        };
-      }
-      return encoder;
     };
 
     return PolymorphicBelongsToAssociation;
@@ -11435,6 +11418,31 @@
 
     __extends(View, _super);
 
+    View.YieldStorage = (function(_super1) {
+
+      __extends(YieldStorage, _super1);
+
+      function YieldStorage() {
+        return YieldStorage.__super__.constructor.apply(this, arguments);
+      }
+
+      YieldStorage.wrapAccessor(function(core) {
+        return {
+          get: function(key) {
+            var val;
+            val = core.get.call(this, key);
+            if (!(val != null)) {
+              val = this.set(key, []);
+            }
+            return val;
+          }
+        };
+      });
+
+      return YieldStorage;
+
+    })(Batman.Hash);
+
     View.store = new Batman.ViewStore();
 
     View.option = function() {
@@ -11468,10 +11476,6 @@
     View.prototype.cache = true;
 
     View.prototype._rendered = false;
-
-    View.prototype.source = '';
-
-    View.prototype.html = '';
 
     View.prototype.node = null;
 
@@ -11524,33 +11528,17 @@
       }
     });
 
-    View.YieldStorage = (function(_super1) {
-
-      __extends(YieldStorage, _super1);
-
-      function YieldStorage() {
-        return YieldStorage.__super__.constructor.apply(this, arguments);
-      }
-
-      YieldStorage.wrapAccessor(function(core) {
-        return {
-          get: function(key) {
-            var val;
-            val = core.get.call(this, key);
-            if (!(val != null)) {
-              val = this.set(key, []);
-            }
-            return val;
-          }
-        };
-      });
-
-      return YieldStorage;
-
-    })(Batman.Hash);
-
     View.accessor('yields', function() {
       return new this.constructor.YieldStorage;
+    });
+
+    View.accessor('fetched?', function() {
+      return this.get('source') != null;
+    });
+
+    View.accessor('readyToRender', function() {
+      var _ref;
+      return this.get('node') && (this.get('fetched?') ? ((_ref = this.get('html')) != null ? _ref.length : void 0) > 0 : true);
     });
 
     function View(options) {
@@ -11570,30 +11558,25 @@
       options.context = context.descend(this);
       View.__super__.constructor.call(this, options);
       Batman.Property.withoutTracking(function() {
-        var node;
-        if (node = _this.get('node')) {
-          return _this.render(node);
-        } else {
-          return _this.observeOnce('node', function(node) {
-            return _this.render(node);
-          });
-        }
+        return _this.observeAndFire('readyToRender', function(ready) {
+          if (ready) {
+            return _this.render();
+          }
+        });
       });
     }
 
-    View.prototype.render = function(node) {
-      var _this = this;
+    View.prototype.render = function() {
+      var node,
+        _this = this;
       if (this._rendered) {
         return;
       }
       this._rendered = true;
-      this.event('ready').resetOneShot();
-      if (node) {
-        this._renderer = new Batman.Renderer(node, this.context, this);
-        return this._renderer.on('rendered', function() {
-          return _this.fire('ready', node);
-        });
-      }
+      this._renderer = new Batman.Renderer(node = this.get('node'), this.get('context'), this);
+      return this._renderer.on('rendered', function() {
+        return _this.fire('ready', node);
+      });
     };
 
     View.prototype.isInDOM = function() {
