@@ -19,7 +19,14 @@ def configure(&block)
   instance_eval(&block)
 end
 
+helpers do
+  def protected!
+    # override with auth logic
+  end
+end
+
 get '/events', provides: 'text/event-stream' do
+  protected!
   stream :keep_open do |out|
     settings.connections << out
     out << latest_events
@@ -36,15 +43,18 @@ get '/' do
 end
 
 get '/:dashboard' do
+  protected!
   erb params[:dashboard].to_sym
 end
 
 get '/views/:widget?.html' do
+  protected!
   widget = params[:widget]
   send_file File.join(Dir.pwd, "widgets/#{widget}/#{widget}.html")
 end
 
 post '/widgets/:id' do
+  protected!
   request.body.rewind
   body =  JSON.parse(request.body.read)
   auth_token = body.delete("auth_token")
