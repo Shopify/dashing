@@ -31,30 +31,45 @@ module AllTheThings
 
     attr_accessor :name
 
+    no_tasks do
+      ['widget', 'dashboard', 'job'].each do |type|
+        define_method "generate_#{type}" do |name|
+          @name = Thor::Util.snake_case(name)
+          directory type.to_sym, File.join("#{type}s")
+        end
+      end
+    end
+
     def self.source_root
       File.expand_path('../../templates', __FILE__)
     end
 
-    desc "install PROJECT_NAME", "Sets up ALL THE THINGS needed for your dashboard project structure."
-    def install(name)
+    desc "new PROJECT_NAME", "Sets up ALL THE THINGS needed for your dashboard project structure."
+    def new(name)
       @name = Thor::Util.snake_case(name)
       directory :project, @name
     end
 
-    desc "new_widget WIDGET_NAME", "Creates a new widget with all the fixins'"
-    def new_widget(name)
-      @name = "widget_#{Thor::Util.snake_case(name)}"
-      directory :widget, File.join('widgets', @name)
+    desc "generate GENERATOR NAME", "Creates a new widget with all the fixins'"
+    def generate(type, name)
+      send("generate_#{type}".to_sym, name)
+    rescue NoMethodError => e
+      puts "Invalid generator. Either use widget, dashboard, or job"
     end 
+    map "g" => :generate
 
     desc "start", "Starts the server in style!"
+    method_option :job_path, :desc => "Specify the directory where jobs are stored"
     def start(*args)
       args = args.join(" ")
-      system("bundle exec thin -R config.ru start #{args}")
+      command = "bundle exec thin -R config.ru start #{args}"
+      command.prepend "export JOB_PATH=#{options[:job_path]}; " if options[:job_path]
+      system(command)
     end
 
     desc "job JOB_NAME AUTH_TOKEN(optional)", "Runs the specified job."
     def job(name, auth_token = "")
+      Dir[File.join(Dir.pwd, 'lib/**/*.rb')].each {|file| require file }
       self.class.auth_token = auth_token
       f = File.join(Dir.pwd, "jobs", "#{name}.rb")
       require f

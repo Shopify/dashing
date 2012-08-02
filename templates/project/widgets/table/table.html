@@ -1,0 +1,8 @@
+<h1 class="title" data-bind="title"></h1>
+
+<table>
+  <tr data-foreach-item="items">
+    <td class="label" data-bind="item.label"></td>
+    <td class="value" data-bind="item.value | shortenedNumber"></td>
+  </tr>
+</table>

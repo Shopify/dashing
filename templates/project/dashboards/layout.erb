@@ -1,21 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8"/>
+  <title>My Awesome Dashboard</title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
   <title><%= yield_content(:title) %></title>
 
   <script type="text/javascript"><%= javascripts %></script>
-  <style><%= stylesheets %></style>
+  <script type="text/javascript" src="/javascripts/jquery.knob.js"></script>
+  <script type="text/javascript" src="/javascripts/jquery.masonry.min.js"></script>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1"/> 
+  <style><%= stylesheets %></style>
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="/stylesheets/font-awesome.css">
+  <link rel="icon" href="/images/favicon.ico">  
 </head>
 <body>
 
-  <div class="wrapper">
+  <div id="container">
     <%= yield %>
   </div>
+
+  <script type="text/javascript">
+    AllTheThings.on('ready', function() {
+      setInterval(function(){
+        $('#container ul').masonry({
+          itemSelector: '.widget-container'
+        });
+      }, 0);
+    });
+  </script>
 
 </body>
 </html>

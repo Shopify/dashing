@@ -1,2 +1,0 @@
-class AllTheThings.<%= Thor::Util.camel_case(name) %> extends AllTheThings.Widget
-  source: '<%= name %>'

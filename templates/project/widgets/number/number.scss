@@ -1,0 +1,35 @@
+// ----------------------------------------------------------------------------
+// Sass declarations
+// ----------------------------------------------------------------------------
+$widget-number_background-color:  #00b1a4;
+$widget-number_value-color:       #fff;
+
+$widget-number_title-color:       lighten($widget-number_background-color, 45%);
+$widget-number_moreinfo-color:    lighten($widget-number_background-color, 45%);
+
+// ----------------------------------------------------------------------------
+// Widget-number styles
+// ----------------------------------------------------------------------------
+.widget-number { 
+
+  background-color: $widget-number_background-color;
+  
+  .title { 
+    color: $widget-number_title-color;
+  }
+
+  .value {
+    color: $widget-number_value-color;
+  }
+
+  .change-rate {
+    font-weight: 300;
+    font-size: 30px;
+    color: $widget-number_value-color;
+  }
+
+  .text-moreinfo {
+    color: $widget-number_moreinfo-color;
+  }
+  
+}

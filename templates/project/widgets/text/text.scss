@@ -1,0 +1,25 @@
+// ----------------------------------------------------------------------------
+// Sass declarations
+// ----------------------------------------------------------------------------
+$widget-text_background-color:  #ec663c;
+$widget-text_value-color:       #fff;
+
+$widget-text_title-color:       lighten($widget-text_background-color, 30%);
+$widget-text_moreinfo-color:    lighten($widget-text_background-color, 30%);
+
+// ----------------------------------------------------------------------------
+// Widget-text styles
+// ----------------------------------------------------------------------------
+.widget-text { 
+
+  background-color: $widget-text_background-color;
+  
+  .title { 
+    color: $widget-text_title-color;
+  }
+
+  .text-moreinfo {
+    color: $widget-text_moreinfo-color;
+  }
+  
+}

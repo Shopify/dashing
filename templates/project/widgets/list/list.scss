@@ -1,0 +1,50 @@
+// ----------------------------------------------------------------------------
+// Sass declarations
+// ----------------------------------------------------------------------------
+$widget-list_background-color:  #12b0c5;
+$widget-list_value-color:       #fff;
+
+$widget-list_title-color:       lighten($widget-list_background-color, 45%);
+$widget-list_label-color:       lighten($widget-list_background-color, 45%);
+
+// ----------------------------------------------------------------------------
+// Widget-list styles
+// ----------------------------------------------------------------------------
+.widget-list { 
+
+  background-color: $widget-list_background-color;
+
+  .title { 
+    color: $widget-list_title-color;
+  }
+
+  ol, ul {
+    margin: 0 15px;
+    text-align: left;
+    color: $widget-list_label-color;
+  }
+
+  ol {
+    list-style-position: inside;
+  }
+
+  li {
+    margin-bottom: 5px;
+  }
+
+  .list-nostyle {
+    list-style: none;
+  }
+
+  .label {
+    color: $widget-list_label-color;    
+  }
+
+  .value {
+    float: right;
+    margin-left: 12px;
+    font-weight: 600;
+    color: $widget-list_value-color;
+  }
+
+}

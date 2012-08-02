@@ -1,0 +1,5 @@
+<ul class="list-nostyle clearfix">
+  <li class="widget-container">
+    <div data-id="widget_id" data-view="MyWidget"></div>
+  </li>
+</ul>

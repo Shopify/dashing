@@ -54,7 +54,6 @@ get '/views/:widget?.html' do
 end
 
 post '/widgets/:id' do
-  protected!
   request.body.rewind
   body =  JSON.parse(request.body.read)
   auth_token = body.delete("auth_token")
@@ -125,5 +124,6 @@ def first_dashboard
   files.first
 end
 
-files = Dir[Dir.pwd + '/jobs/*.rb']
+job_path = ENV["JOB_PATH"] || 'jobs'
+files = Dir[Dir.pwd + "/#{job_path}/*.rb"]
 files.each { |job| require(job) } 

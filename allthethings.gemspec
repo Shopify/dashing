@@ -2,7 +2,7 @@ Gem::Specification.new do |s|
   s.name        = 'allthethings'
   s.version     = '0.1.0'
   s.date        = '2012-07-24'
-  s.executables << 'att'
+  s.executables << 'things'
 
 
   s.summary     = "A simple & flexible framework for creating dashboards."

@@ -1,0 +1,11 @@
+class AllTheThings.<%= Thor::Util.camel_case(name) %> extends AllTheThings.Widget
+  source: '<%= name %>'
+
+  ready: ->
+    # This is fired when the widget is done being rendered
+
+  onData: (data) ->
+    # Handle incoming data
+    # You can access the html node of this widget with `@node`
+    # Example: $(@node).effect("pulsate") will make the node flash each time data comes in.
+    super

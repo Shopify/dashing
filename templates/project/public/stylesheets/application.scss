@@ -1,0 +1,238 @@
+// ----------------------------------------------------------------------------
+// Sass declarations
+// ----------------------------------------------------------------------------
+$background-color: #222;
+$text-color: #fff;
+
+$background-warning-color-1: #e82711;
+$background-warning-color-2: #9b2d23;
+$text-warning-color: #fff;
+
+$background-danger-color-1: #eeae32;
+$background-danger-color-2: #ff9618;
+$text-danger-color: #fff;
+
+@-webkit-keyframes status-warning-background {
+  0%   { background-color: $background-warning-color-1; }
+  50%  { background-color: $background-warning-color-2; }
+  100% { background-color: $background-warning-color-1; }
+}
+@-webkit-keyframes status-danger-background {
+  0%   { background-color: $background-danger-color-1; }
+  50%  { background-color: $background-danger-color-2; }
+  100% { background-color: $background-danger-color-1; }
+}
+@mixin animation($animation-name, $duration, $function, $animation-iteration-count:""){
+  -webkit-animation:  $animation-name $duration $function #{$animation-iteration-count};
+  -moz-animation:     $animation-name $duration $function #{$animation-iteration-count};
+  -ms-animation:      $animation-name $duration $function #{$animation-iteration-count};
+}
+
+// ----------------------------------------------------------------------------
+// Base styles
+// ----------------------------------------------------------------------------
+html { 
+  font-size: 100%; 
+  -webkit-text-size-adjust: 100%; 
+  -ms-text-size-adjust: 100%; 
+}
+
+body { 
+  margin: 0; 
+  background: #fff; 
+  font-size: 20px;
+  color: $text-color;
+  font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+b, strong { 
+  font-weight: bold; 
+}
+
+img { 
+  border: 0; 
+  -ms-interpolation-mode: bicubic; 
+  vertical-align: middle; 
+}
+
+img, object { 
+  max-width: 100%; 
+}
+
+iframe { 
+  max-width: 100%; 
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+}
+
+td {
+  vertical-align: middle;
+}
+
+ul, ol { 
+  padding: 0; 
+  margin: 0; 
+}
+
+h1, h2, h3, h4, h5, p { 
+  padding: 0;
+  margin: 0; 
+}
+h1 { 
+  margin-bottom: 12px;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 300;
+}
+h2 {
+  text-transform: uppercase;
+  font-size: 80px;
+  font-weight: 700;
+  color: $text-color;
+}
+h3 {
+  font-size: 25px;
+  font-weight: 600;
+  color: $text-color;
+}
+
+// ----------------------------------------------------------------------------
+// Base widget styles
+// ----------------------------------------------------------------------------
+#container { 
+  padding: 5px 0;
+}
+
+.list-nostyle {
+  list-style: none;
+}
+
+.widget-container {
+  float: left;
+  width: 100%;
+}
+
+.widget { 
+  padding: 20px 5%;
+  margin: 5px;
+  text-align: center;
+  background-color: $background-color;
+}
+
+.widget.status-warning {
+  background-color: $background-warning-color-1;
+  @include animation(status-warning-background, 2s, ease, infinite);
+
+  .icon-warning-sign { 
+    display: inline-block;
+  }
+
+  .title, .text-moreinfo {
+    color: $text-warning-color;
+  }
+}
+
+.widget.status-danger {
+  color: $text-danger-color;
+  background-color: $background-danger-color-1;
+  @include animation(status-danger-background, 2s, ease, infinite);
+
+  .icon-warning-sign { 
+    display: inline-block;
+  }
+
+  .title, .text-moreinfo {
+    color: $text-danger-color;
+  }
+}
+
+.text-moreinfo {
+  margin-top: 12px;
+  font-size: 15px;
+}
+
+// ----------------------------------------------------------------------------
+// Media queries: adjust number of columns based on screen width
+// ----------------------------------------------------------------------------
+@media only screen and (min-width: 480px) {
+  // # of columns = 2
+  // column-1     = 50%
+  // column-2     = 50%
+  .widget-container {
+    width: 50%;
+  }
+  .widget-value {
+    font-size: 40px;
+  }
+}
+@media only screen and (min-width: 768px) {
+  // # of columns = 3
+  // column-1     = 33%
+  // column-2     = 33%
+  // column-3     = 33% 
+  .widget-container:nth-child(3n+1) {
+    width: 33%;
+  }
+  .widget-container:nth-child(3n+2) {
+    width: 33%;
+  }
+  .widget-container:nth-child(3n+3) {
+    width: 33%;
+  }
+} 
+@media only screen and (min-width: 992px) {
+  // # of columns = 4
+  // column-1     = 25%
+  // column-2     = 25%
+  // column-3     = 25%  
+  // column-4     = 25%  
+  .widget-container:nth-child(4n+1) {
+    width: 25%;
+  }
+  .widget-container:nth-child(4n+2) {
+    width: 25%;
+  }
+  .widget-container:nth-child(4n+3) {
+    width: 25%;
+  }
+  .widget-container:nth-child(4n+4) {
+    width: 25%;
+  }
+  .widget-value {
+    font-size: 30px;
+  }
+}
+@media only screen and (min-width: 1382px) {
+  // # of columns = 5
+  // column-1     = 20%
+  // column-2     = 20%
+  // column-3     = 20%  
+  // column-4     = 20%  
+  // column-5     = 20%  
+  .widget-container:nth-child(5n+1) {
+    width: 20%;
+  }
+  .widget-container:nth-child(5n+2) {
+    width: 20%;
+  }
+  .widget-container:nth-child(5n+3) {
+    width: 20%;
+  }
+  .widget-container:nth-child(5n+4) {
+    width: 20%;
+  }
+  .widget-container:nth-child(5n+5) {
+    width: 20%;
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Clearfix
+// ----------------------------------------------------------------------------
+.clearfix:before, .clearfix:after { content: "\0020"; display: block; height: 0; overflow: hidden; }
+.clearfix:after { clear: both; }
+.clearfix { zoom: 1; }

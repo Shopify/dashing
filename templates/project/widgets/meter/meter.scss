@@ -1,0 +1,35 @@
+// ----------------------------------------------------------------------------
+// Sass declarations
+// ----------------------------------------------------------------------------
+$widget-meter_background-color: #9c4274;
+$widget-meter_value-color:      #fff;
+
+$widget-meter_title-color:      lighten($widget-meter_background-color, 45%);
+$widget-text_moreinfo-color:    lighten($widget-meter_background-color, 45%);
+
+$widget-meter-bg: darken($widget-meter_background-color, 15%);
+$widget-meter-fg: lighten($widget-meter_background-color, 75%);
+
+// ----------------------------------------------------------------------------
+// Widget-meter styles
+// ----------------------------------------------------------------------------
+.widget-meter { 
+
+  background-color: $widget-meter_background-color;
+  
+  input.meter { 
+    background-color: $widget-meter-bg;
+    color: $widget-meter-fg;
+  }
+
+  .title { 
+    color: $widget-meter_title-color;
+  }
+
+  .text-moreinfo {
+    font-weight: 600;
+    font-size: 20px;
+    margin-top: 0;
+  }
+  
+}

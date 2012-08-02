@@ -1,11 +1,22 @@
-Batman.Filters.PrettyNumber = (num) ->
+Batman.Filters.prettyNumber = (num) ->
   num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") unless isNaN(num)
 
 Batman.Filters.dashize = (str) ->
   dashes_rx1 = /([A-Z]+)([A-Z][a-z])/g;
   dashes_rx2 = /([a-z\d])([A-Z])/g;
 
-  return str.replace(dashes_rx1, '$1_$2').replace(dashes_rx2, '$1_$2').replace('_', '-').toLowerCase();
+  return str.replace(dashes_rx1, '$1_$2').replace(dashes_rx2, '$1_$2').replace('_', '-').toLowerCase()
+
+Batman.Filters.shortenedNumber = (num) ->
+  return if isNaN(num)
+  if num >= 1000000000
+    (num / 1000000000).toFixed(1) + 'B'
+  else if num >= 1000000
+    (num / 1000000).toFixed(1) + 'M'
+  else if num >= 1000
+    (num / 1000).toFixed(1) + 'K'
+  else
+    num
 
 class window.AllTheThings extends Batman.App
   @root -> 
@@ -37,7 +48,7 @@ AllTheThings.widgets = widgets = {}
 AllTheThings.lastEvents = lastEvents = {}
 
 source = new EventSource('/events')
-source.addEventListener 'open', (e)->
+source.addEventListener 'open', (e) ->
   console.log("Connection opened")
 
 source.addEventListener 'error', (e)->
