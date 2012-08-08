@@ -1,7 +1,5 @@
-class AllTheThings.List extends AllTheThings.Widget
-  source: 'list'
-
-  @accessor 'current', Batman.Property.EasingSetter
+class Dashing.List extends Dashing.Widget
+  @accessor 'current', Dashing.AnimatedValue
 
   @accessor 'arrow', ->
     if @get('last')

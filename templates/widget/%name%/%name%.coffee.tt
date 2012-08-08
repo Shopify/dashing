@@ -1,5 +1,4 @@
-class AllTheThings.<%= Thor::Util.camel_case(name) %> extends AllTheThings.Widget
-  source: '<%= name %>'
+class Dashing.<%= Thor::Util.camel_case(name) %> extends Dashing.Widget
 
   ready: ->
     # This is fired when the widget is done being rendered
@@ -7,5 +6,5 @@ class AllTheThings.<%= Thor::Util.camel_case(name) %> extends AllTheThings.Widge
   onData: (data) ->
     # Handle incoming data
     # You can access the html node of this widget with `@node`
-    # Example: $(@node).effect("pulsate") will make the node flash each time data comes in.
+    # Example: $(@node).fadeOut().fadeIn() will make the node flash each time data comes in.
     super

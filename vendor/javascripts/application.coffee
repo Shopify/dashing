@@ -18,10 +18,10 @@ Batman.Filters.shortenedNumber = (num) ->
   else
     num
 
-class window.AllTheThings extends Batman.App
+class window.Dashing extends Batman.App
   @root -> 
 
-Batman.Property.EasingSetter =
+Dashing.AnimatedValue =
   get: Batman.Property.defaultAccessor.get
   set: (k, to) ->
     if isNaN(to)
@@ -44,8 +44,8 @@ Batman.Property.EasingSetter =
             @set k, to
       @[k] = num    
 
-AllTheThings.widgets = widgets = {}
-AllTheThings.lastEvents = lastEvents = {}
+Dashing.widgets = widgets = {}
+Dashing.lastEvents = lastEvents = {}
 
 source = new EventSource('/events')
 source.addEventListener 'open', (e) ->
@@ -65,4 +65,4 @@ source.addEventListener 'message', (e) =>
 
 
 $(document).ready ->
-  AllTheThings.run()
+  Dashing.run()

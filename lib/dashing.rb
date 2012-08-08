@@ -5,20 +5,15 @@ require 'coffee-script'
 require 'sass'
 require 'json'
 
-Dir[File.join(Dir.pwd, 'lib/**/*.rb')].each {|file| require file }
-
 SCHEDULER = Rufus::Scheduler.start_new
 
 set server: 'thin', connections: [], history: {}
+set :public_folder, File.join(Dir.pwd, 'public')
+set :views, File.join(Dir.pwd, 'dashboards')
+set :default_dashboard, nil
+set :auth_token, nil
+
 helpers Sinatra::ContentFor
-
-def configure(&block)
-  set :public_folder, Dir.pwd + '/public'
-  set :views, Dir.pwd + '/dashboards'
-  set :default_dashboard, nil
-  instance_eval(&block)
-end
-
 helpers do
   def protected!
     # override with auth logic
@@ -50,14 +45,14 @@ end
 get '/views/:widget?.html' do
   protected!
   widget = params[:widget]
-  send_file File.join(Dir.pwd, "widgets/#{widget}/#{widget}.html")
+  send_file File.join(Dir.pwd, 'widgets', widget, "#{widget}.html")
 end
 
 post '/widgets/:id' do
   request.body.rewind
   body =  JSON.parse(request.body.read)
   auth_token = body.delete("auth_token")
-  if auth_token == settings.auth_token
+  if !settings.auth_token || settings.auth_token == auth_token
     send_event(params['id'], body)
     204 # response without entity body
   else
@@ -68,7 +63,7 @@ end
 
 def framework_javascripts
   ['jquery.js', 'es5-shim.js', 'batman.js', 'batman.jquery.js', 'application.coffee', 'widget.coffee'].collect do |f|
-    File.join(File.expand_path("../../vendor/javascripts", __FILE__), f)
+    File.join(File.expand_path('../../vendor/javascripts', __FILE__), f)
   end
 end
 
@@ -119,11 +114,13 @@ def latest_events
 end
 
 def first_dashboard
-  files = Dir[settings.views  + "/*.erb"].collect { |f| f.match(/(\w*).erb/)[1] }
+  files = Dir[File.join(settings.views, '*.erb')].collect { |f| f.match(/(\w*).erb/)[1] }
   files -= ['layout']
   files.first
 end
 
+Dir[File.join(Dir.pwd, 'lib', '**', '*.rb')].each {|file| require file }
+
 job_path = ENV["JOB_PATH"] || 'jobs'
-files = Dir[Dir.pwd + "/#{job_path}/*.rb"]
+files = Dir[File.join(Dir.pwd, job_path, '/*.rb')]
 files.each { |job| require(job) } 

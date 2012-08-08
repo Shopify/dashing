@@ -1,2 +1,1 @@
-class AllTheThings.Text extends AllTheThings.Widget
-  source: 'text'
+class Dashing.Text extends Dashing.Widget

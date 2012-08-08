@@ -13,14 +13,14 @@ end
 def send_event(id, data)
   req = Net::HTTP::Post.new("/widgets/#{id}")
   req["content-type"] = "application/json"
-  req.body = JSON.unparse(data.merge(:auth_token => AllTheThings::CLI.auth_token))
+  req.body = JSON.unparse(data.merge(:auth_token => Dashing::CLI.auth_token))
   res = Net::HTTP.new('localhost', 3000).start { |http| http.request(req) }
   puts "Data Sent to #{id}: #{data}"
 end
 
 SCHEDULER = MockScheduler.new
 
-module AllTheThings
+module Dashing
 
   class CLI < Thor
     include Thor::Actions
@@ -66,6 +66,7 @@ module AllTheThings
       command.prepend "export JOB_PATH=#{options[:job_path]}; " if options[:job_path]
       system(command)
     end
+    map "s" => :start
 
     desc "job JOB_NAME AUTH_TOKEN(optional)", "Runs the specified job."
     def job(name, auth_token = "")
@@ -78,4 +79,4 @@ module AllTheThings
   end
 end
 
-AllTheThings::CLI.start
+Dashing::CLI.start

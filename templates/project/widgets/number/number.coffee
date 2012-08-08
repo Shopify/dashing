@@ -1,9 +1,5 @@
-class AllTheThings.Number extends AllTheThings.Widget
-  source: 'number'
-
-  @accessor 'current', Batman.Property.EasingSetter
-
-  ready: ->
+class Dashing.Number extends Dashing.Widget
+  @accessor 'current', Dashing.AnimatedValue
 
   @accessor 'difference', ->
     if @get('last')
