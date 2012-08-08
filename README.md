@@ -8,7 +8,7 @@ Dashing is a framework for building web-based dashboards.
 
 Features:
 
- - Custom widgets! Built using whatever HTML/Coffeescript wizardry you posses
+ - Custom widgets! Built using whatever HTML/Coffeescript wizardry you possess
  - Multiple dashboards! You can have many different views all hosted by the same app
  - Shareable widgets!
  - ...
@@ -23,7 +23,7 @@ Features:
 
     ```dashing new sweet_dashboard_project```
 
-  3. Change your directory to ```sweet_dashboard_project``` and start the Dashing
+  3. Change your directory to ```sweet_dashboard_project``` and start Dashing
 
     ```dashing start```
 
@@ -107,7 +107,7 @@ $text_title-color:       lighten($widget-text-color, 30%);
 
 ### Jobs
 
-Dashing uses [rufus-scheduler](http://rufus.rubyforge.org/rufus-scheduler/) to schedule jobs. You can make a new job with ```things job super_job``` which will create a file in the jobs folder called ```super_job.rb```.
+Dashing uses [rufus-scheduler](http://rufus.rubyforge.org/rufus-scheduler/) to schedule jobs. You can make a new job with ```dashing job super_job``` which will create a file in the jobs folder called ```super_job.rb```.
 
 Use ```send_event('WIDGET_ID', {text: SAMPLE_DATUMS})```
 
