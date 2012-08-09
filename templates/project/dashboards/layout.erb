@@ -22,12 +22,13 @@
       $('#container ul').masonry({ itemSelector: '.widget-container' });
     }
 
-    Dashing.on('ready', function() {
-      setTimeout(relayout, 0);
+    Dashing.Widget.on('ready', function(){
+      setTimeout(function(){
+        relayout();
+      }, 0);
     });
 
     $(window).resize(relayout);
-
   </script>
 </head>
 <body>

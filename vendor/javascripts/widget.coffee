@@ -12,5 +12,9 @@ class Dashing.Widget extends Batman.View
     type = Batman.Filters.dashize(@view)
     $(@node).addClass("widget widget-#{type} #{@id}")
 
+
+  @::on 'ready', ->
+    Dashing.Widget.fire 'ready'
+
   onData: (data) =>
     @mixin(data)
