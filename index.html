@@ -38,108 +38,180 @@
         <a class="button" href=""><i class="icon-github"></i> View on Github</a>
         <a class="button" href=""><i class="icon-download"></i> Download ZIP</a>
       </div>
-      <div id="actions-github"> 
+      <div id="actions-github">
         <iframe src="http://ghbtns.com/github-btn.html?user=markdotto&repo=allthethings&type=watch&count=false"
-          allowtransparency="true" frameborder="0" scrolling="0" width="51px" height="20px"></iframe>
+        allowtransparency="true" frameborder="0" scrolling="0" width="51px" height="20px"></iframe>
         <iframe src="http://ghbtns.com/github-btn.html?user=markdotto&repo=allthethings&type=fork&count=false"
-          allowtransparency="true" frameborder="0" scrolling="0" width="53px" height="20px"></iframe>
+        allowtransparency="true" frameborder="0" scrolling="0" width="53px" height="20px"></iframe>
         <iframe src="http://ghbtns.com/github-btn.html?user=shopify&type=follow&count=true"
-          allowtransparency="true" frameborder="0" scrolling="0" width="165px" height="20px"></iframe>  
+        allowtransparency="true" frameborder="0" scrolling="0" width="165px" height="20px"></iframe>
       </div>
     </section>
 
     <section class="section-box" id="overview">
-      <h3 class="section-title">Overview</h3>
+      <h3 class="section-title">Introduction</h3>
       <a class="back-up-link" href="/">Back to top</a>
       <div class="section-content">
-        <p>Dashing is a framework for building web-based dashboards.</p>
+        <p>Dashing is a framework for building web-based dashboards using coffeescript and ruby that you host yourself. We were tired of the lack of control we had over hosted dashboard solutions, so we uilt our own. With Dashing everything is source controlled and nothing is off limits.</p>
 
+        <p>Featuring:
         <ul>
-          <li>Fully customizable and version controlled: Each widget type has their own HTML/CSS and Coffeescript file</li>
-          <li>Responsive layout: Basic styling is provided to optimize the viewing on device</li>
-          <li>Multiple dashboards: You can build many views all hosted in the same location</li>
-          <li>Shared widgets</li>
-          <li>Push or pull data</li>
-          <li>Secure</li>
+          <li>Custom widgets! Built using whatever HTML/Coffeescript wizardry you posses</li>
+          <li>Multiple dashboards! You can have many different views all hosted in the same location</li>
+          <li>Shared widgets! It&rsquo;s easy to have have the same widget show up on different dashboards</li>
+          <li>Push or pull data, you decide!</li>
+          <li>Responsive grid layout! Your dashboard will look good on any sized screen</li>
         </ul>
+        </p>
       </div>
     </section>
 
     <section class="section-box" id="setup">
-      <h3 class="section-title">Installation & Setup</h3>
+      <h3 class="section-title">Installation &amp; Setup</h3>
       <a class="back-up-link" href="/">Back to top</a>
       <div class="section-content">
         <ol>
           <li>
-              Install the gem from the command line:
-            <p>
-              <code>
-              gem install dashing
-              </code>
-            </p>
+            <p> Install the gem from the command line:</p>
+            <p><code>gem install dashing</code></p>
           </li>
           <li>
-            Generate a new project:
-            <p>
-              <code>
-              dash new dashboard_project
-              </code>
-            </p>
+            <p> Generate a new project:</p>
+            <p><code>dashing new sweet_dashboard_project</code></p>
           </li>
           <li>
-            Change your directory to dashboard_project and start dashing
-            <p>
-              <code>
-              dash start
-              </code>
-            </p>
+            <p> Change your directory to <code>sweet_dashboard_project</code> and start Dashing</p>
+            <p><code>dashing start</code></p>
           </li>
           <li>
-            View <a href="http://localhost:3000">http://localhost:3000</a> on your browser
-            <p>
-            <b>main.erb</b> contains the layout for the default dashboard. You can add additional dashboards by running dashing COMMAND THINGY new_view which creates a new_view.erb file in dashboards/. That new view will be accessible at localhost:3000/new_view
-            </p>
+            <p> Point your browser at <a href="http://localhost:3000">localhost:3000</a> and have fun!</p>
           </li>
         </ol>
       </div>
     </section>
 
-    <section class="section-box" id="demo">
-      <h3 class="section-title">Demo</h3>
+    <section class="section-box" id="widgets">
+      <h3 class="section-title">Widgets</h3>
       <a class="back-up-link" href="/">Back to top</a>
       <div class="section-content">
-        <script src="https://gist.github.com/3129747.js?file=gridster.html"></script>
+        <p>Widgets are represented by a <code>div</code> element with <code>data-id</code> and <code>data-view</code> attributes. For example, the following is a valid widget:</p>
+        <script src="https://gist.github.com/3317292.js?file=simple_widget.html"></script>
+
+        <p>The <code>data-id</code> attribute sets the <strong>widget ID</strong> which will be used to push data to the widget. Two widgets can have the same widget id, allowing you to have the same widget in multiple dashboards.</p>
+
+        <p><code>data-view</code> specifies the type of widget what will be used. This field is case sensitive and must match the <a href="#coffeescript">coffeescript class</a> of the widget. See below.</p>
+
+        <p>This <code>&lt;div&gt;</code> can also be used to configure your widgets. For example, the pre-bundled widgets let you set a title with <code>data-title="Widget Title"</code>.</p>
+
+        <h4>Making you own widget</h4>
+
+        <p>A widget consists of three parts:</p>
+
+        <ul>
+          <li>an html file used for layout and bindings</li>
+          <li>a scss file for style</li>
+          <li>a coffeescript file which allows you to operate on the data</li>
+        </ul>
+
+
+        <p>To make your own run <code>dashing generate sweet_widget</code> which will create scaffolding files in the <code>widget/</code> folder or your project.</p>
+
+        <h5>sweet_widget.html</h5>
+
+        <p>Contains the HTML for you widget. We use <a href="http://batmanjs.org/docs/batman.html#batman-view-bindings-how-to-use-bindings">batman bindings</a> in order to update the content of a widget. In the example below, updating the title attribute of the coffeescript object representing that widget will set the innerHTML of the <code>&lt;h1&gt;</code> element. Dashing provides a simple way to update your widgets attributes through a push interface and a pull interface. See the Getting Data into Dashing section.</p>
+
+        <h6>Example</h6>
+        <script src="https://gist.github.com/3316999.js?file=widget_sample.html"></script>
+
+        <h5 id="coffeescript">sweet_widget.coffee</h5>
+
+        <p>This coffee script file allows you to perform any operations you wish on your widget. In the example below we can initialize things with the constructor method. We can also manipulate the data we recieve from data updates. Data will be the JSON object you pass in.</p>
+
+        <h6>Example</h6>
+        <script src="https://gist.github.com/3317019.js?file=widget_sample.coffee"></script>
+
+        <h5>sweet_widget.scss</h5>
+
+        <h6>Example</h6>
+        <script src="https://gist.github.com/3317022.js?file=widget_sample.scss"></script>
+
       </div>
     </section>
 
-    <section class="section-box" id="documentation">
-      <h3 class="section-title">Documentation</h3>
+    <section class="section-box" id="data">
+      <h3 class="section-title">Getting Data into Dashing</h3>
       <a class="back-up-link" href="/">Back to top</a>
       <div class="section-content">
-        <h4>Widgets</h4>
-Widgets are represented by a div element with data-id and data-view attributes. eg:
-<script src="https://gist.github.com/3310395.js?file=gistfile1.html"></script>
 
-The data-id attribute is used to set the widget ID which will be used when to push data to the widget. Two widgets can have the same widget id, allowing you to have the same widget in multiple dashboards.
+        <p>Providing data to widgets is easy. You specify which widget you want using a widget id. Dashing expects the data you send to be in JSON format. Upon getting data, dashing mixes the json into the widget object. So it&rsquo;s easy to update multiple attributes within the same object.</p>
 
-data-view specifies the type of widget what will be used. This field is case sensitive and must match the coffeescript class of the widget. See making your own widget section for more details.
+        <h4>Jobs</h4>
 
-This can also be used to configure your widgets. For example, the pre-bundled widgets let you set a title with data-title="Widget Title".
-      </div>
-    </section>
+        <p>Dashing uses <a href="http://rufus.rubyforge.org/rufus-scheduler/">rufus-scheduler</a> to schedule jobs. You can make a new job with <code>dashing job super_job</code> which will create a file in the jobs folder called <code>super_job.rb</code>. Data is sent to a widget using the <code>send_event(widget_id, json_formatted_data)</code> method.</p>
 
-    <section class="section-box" id="release-notes">
-      <h3 class="section-title">Release Notes</h3>
-      <a class="back-up-link" href="/">Back to top</a>
-      <p class="section-content"></p>
-    </section>
-  </div>
+        <h6>Example</h6>
+        <script src="https://gist.github.com/3317036.js?file=sample_job.rb"></script>
 
-  <footer>
-  </footer>
+        <h4>Push</h4>
+
+        <p>You can also push data directly to your dashboard! Post the data you want in json to <code>/widgets/widget_id</code>.
+          For security, you will also have to include your auth_token (which can be found in <code>config.ru</code>) as part of the json object.</p>
+
+          <h6>Example</h6>
+
+          <script src="https://gist.github.com/3317042.js?file=push.sh"></script>
+
+          <p>or</p>
+
+          <script src="https://gist.github.com/3317048.js?file=push.rb"></script>
+
+        </div>
+      </section>
+
+      <section class="section-box" id="dashboards">
+        <h3 class="section-title">Dashboards</h3>
+        <a class="back-up-link" href="/">Back to top</a>
+        <div class="section-content">
+          <p><code>main.erb</code> contains the layout for the default dashboard which is accessible at <code>/</code>. You can add additional dashboards with by running <code>dashing generate dashboard new_view</code> which creates a <code>new_view.erb</code> file in <code>dashboards/</code>. That new view will be accessible at <code>localhost:3000/new_view</code></p>
+
+          <h4>Layout</h4>
+
+          <h1>GRIDSTER STUFF YEAHHHHHH</h1>
+
+        </div>
+      </section>
+
+      <section class="section-box" id="dependencies">
+        <h3 class="section-title">Things we used</h3>
+        <a class="back-up-link" href="/">Back to top</a>
+        <div class="section-content">
+          <ul>
+            <li><a href="http://www.sinatrarb.com/">Sinatra</a></li>
+            <li><a href="http://batmanjs.org/">batman.js</a></li>
+            <li><a href="http://rufus.rubyforge.org/rufus-scheduler/">rufus-scheduler</a></li>
+            <li><a href="https://github.com/wycats/thor/">Thor</a></li>
+            <li><a href="http://anthonyterrien.com/knob/">jQuery-knob</a></li>
+            <li><a href="http://gridster.net/">gridster.js</a></li>
+            <li><a href="http://code.macournoyer.com/thin/">thin</a></li>
+            <li><a href="http://sass-lang.com/">Sass</a></li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section-box" id="license">
+        <h3 class="section-title">License</h3>
+        <a class="back-up-link" href="/">Back to top</a>
+        <div class="section-content">
+          <p>Dashing is released under the MIT license</p>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+    </footer>
 
 
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
-</body>
-</html>
+  </body>
+  </html>
