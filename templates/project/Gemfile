@@ -1,3 +1,0 @@
-source :rubygems
-
-gem 'allthethings', '0.1.0', :git => 'git@github.com:Shopify/allthethings.git'

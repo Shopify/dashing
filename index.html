@@ -1,0 +1,145 @@
+<!doctype html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title></title>
+  <meta name="description" content="">
+
+  <meta name="viewport" content="width=device-width">
+
+  <link href='http://fonts.googleapis.com/css?family=Coustard|Cutive|Quando' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="css/font-awesome.css">
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+  <div role="main" id="container">
+    <nav id="main-navigation">
+      <ul class="clearfix">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#setup">Installation & Setup</a></li>
+        <li><a href="#demo">Demo</a></li>
+        <li><a href="#documentation">Documentation</a></li>
+        <li><a href="#release-notes">Release Notes</a></li>
+      </ul>
+    </nav>
+
+    <section id="heading" class="clearfix">
+      <div id="logo-heading">
+        <h1>Dashing</h1>
+        <h2>A exceptionally handsome dashboard framework solution, from Shopify</h2>
+      </div>
+      <div id="logo-bowtie">
+        <img src="images/bowtie.png"/>
+      </div>
+      <div id="actions">
+        <a class="button" href=""><i class="icon-github"></i> View on Github</a>
+        <a class="button" href=""><i class="icon-download"></i> Download ZIP</a>
+      </div>
+      <div id="actions-github"> 
+        <iframe src="http://ghbtns.com/github-btn.html?user=markdotto&repo=allthethings&type=watch&count=false"
+          allowtransparency="true" frameborder="0" scrolling="0" width="51px" height="20px"></iframe>
+        <iframe src="http://ghbtns.com/github-btn.html?user=markdotto&repo=allthethings&type=fork&count=false"
+          allowtransparency="true" frameborder="0" scrolling="0" width="53px" height="20px"></iframe>
+        <iframe src="http://ghbtns.com/github-btn.html?user=shopify&type=follow&count=true"
+          allowtransparency="true" frameborder="0" scrolling="0" width="165px" height="20px"></iframe>  
+      </div>
+    </section>
+
+    <section class="section-box" id="overview">
+      <h3 class="section-title">Overview</h3>
+      <a class="back-up-link" href="/">Back to top</a>
+      <div class="section-content">
+        <p>Dashing is a framework for building web-based dashboards.</p>
+
+        <ul>
+          <li>Fully customizable and version controlled: Each widget type has their own HTML/CSS and Coffeescript file</li>
+          <li>Responsive layout: Basic styling is provided to optimize the viewing on device</li>
+          <li>Multiple dashboards: You can build many views all hosted in the same location</li>
+          <li>Shared widgets</li>
+          <li>Push or pull data</li>
+          <li>Secure</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section-box" id="setup">
+      <h3 class="section-title">Installation & Setup</h3>
+      <a class="back-up-link" href="/">Back to top</a>
+      <div class="section-content">
+        <ol>
+          <li>
+              Install the gem from the command line:
+            <p>
+              <code>
+              gem install dashing
+              </code>
+            </p>
+          </li>
+          <li>
+            Generate a new project:
+            <p>
+              <code>
+              dash new dashboard_project
+              </code>
+            </p>
+          </li>
+          <li>
+            Change your directory to dashboard_project and start dashing
+            <p>
+              <code>
+              dash start
+              </code>
+            </p>
+          </li>
+          <li>
+            View <a href="http://localhost:3000">http://localhost:3000</a> on your browser
+            <p>
+            <b>main.erb</b> contains the layout for the default dashboard. You can add additional dashboards by running dashing COMMAND THINGY new_view which creates a new_view.erb file in dashboards/. That new view will be accessible at localhost:3000/new_view
+            </p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section-box" id="demo">
+      <h3 class="section-title">Demo</h3>
+      <a class="back-up-link" href="/">Back to top</a>
+      <div class="section-content">
+        <script src="https://gist.github.com/3129747.js?file=gridster.html"></script>
+      </div>
+    </section>
+
+    <section class="section-box" id="documentation">
+      <h3 class="section-title">Documentation</h3>
+      <a class="back-up-link" href="/">Back to top</a>
+      <div class="section-content">
+        <h4>Widgets</h4>
+Widgets are represented by a div element with data-id and data-view attributes. eg:
+<script src="https://gist.github.com/3310395.js?file=gistfile1.html"></script>
+
+The data-id attribute is used to set the widget ID which will be used when to push data to the widget. Two widgets can have the same widget id, allowing you to have the same widget in multiple dashboards.
+
+data-view specifies the type of widget what will be used. This field is case sensitive and must match the coffeescript class of the widget. See making your own widget section for more details.
+
+This can also be used to configure your widgets. For example, the pre-bundled widgets let you set a title with data-title="Widget Title".
+      </div>
+    </section>
+
+    <section class="section-box" id="release-notes">
+      <h3 class="section-title">Release Notes</h3>
+      <a class="back-up-link" href="/">Back to top</a>
+      <p class="section-content"></p>
+    </section>
+  </div>
+
+  <footer>
+  </footer>
+
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+</body>
+</html>
