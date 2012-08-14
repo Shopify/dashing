@@ -50,7 +50,7 @@ module Dashing
       directory :project, @name
     end
 
-    desc "generate GENERATOR NAME", "Creates a new widget with all the fixins'"
+    desc "generate GENERATOR NAME", "Creates a new wigdget, dashboard, or job."
     def generate(type, name)
       send("generate_#{type}".to_sym, name)
     rescue NoMethodError => e

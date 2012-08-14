@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.files       = ["lib/Dashing.rb"]
   s.homepage    = 'http://Dashing.shopify.com'
 
-  s.files = Dir['README.md', 'vendor/**/*', 'templates/**/*','templates/**/.[a-z]*', 'lib/**/*']
+  s.files = Dir['README.md', 'javascripts/**/*', 'templates/**/*','templates/**/.[a-z]*', 'lib/**/*']
 
   s.add_dependency('sass')
   s.add_dependency('coffee-script')
@@ -21,5 +21,6 @@ Gem::Specification.new do |s|
   s.add_dependency('thin')
   s.add_dependency('rufus-scheduler')
   s.add_dependency('thor')
+  s.add_dependency('sprockets')
 
 end

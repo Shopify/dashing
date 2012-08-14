@@ -1,4 +1,5 @@
 require 'sinatra'
+require 'sprockets'
 require 'sinatra/content_for'
 require 'rufus/scheduler'
 require 'coffee-script'
@@ -7,9 +8,18 @@ require 'json'
 
 SCHEDULER = Rufus::Scheduler.start_new
 
+set :root, Dir.pwd
+
+set :sprockets,     Sprockets::Environment.new(settings.root)
+set :assets_prefix, '/assets'
+set :digest_assets, false
+['assets/javascripts', 'assets/stylesheets', 'assets/fonts', 'assets/images', 'widgets', File.expand_path('../../javascripts', __FILE__)]. each do |path|
+  settings.sprockets.append_path path
+end
+
 set server: 'thin', connections: [], history: {}
-set :public_folder, File.join(Dir.pwd, 'public')
-set :views, File.join(Dir.pwd, 'dashboards')
+set :public_folder, File.join(settings.root, 'public')
+set :views, File.join(settings.root, 'dashboards')
 set :default_dashboard, nil
 set :auth_token, nil
 
@@ -45,7 +55,7 @@ end
 get '/views/:widget?.html' do
   protected!
   widget = params[:widget]
-  send_file File.join(Dir.pwd, 'widgets', widget, "#{widget}.html")
+  send_file File.join(settings.root, 'widgets', widget, "#{widget}.html")
 end
 
 post '/widgets/:id' do
@@ -61,39 +71,12 @@ post '/widgets/:id' do
   end
 end
 
-def framework_javascripts
-  ['jquery.js', 'es5-shim.js', 'batman.js', 'batman.jquery.js', 'application.coffee', 'widget.coffee'].collect do |f|
-    File.join(File.expand_path('../../vendor/javascripts', __FILE__), f)
-  end
+def development?
+  ENV['RACK_ENV'] == 'development'
 end
 
-def widget_javascripts
-  asset_paths("/widgets/**/*.coffee")
-end
-
-def javascripts
-  (framework_javascripts + widget_javascripts).collect do |f|
-    if File.extname(f) == ".coffee"
-      begin
-      CoffeeScript.compile(File.read(f))
-      rescue ExecJS::ProgramError => e
-        message = e.message + ": in #{f}"
-        raise ExecJS::ProgramError.new(message)
-      end
-    else
-      File.read(f)
-    end
-  end.join("\n")
-end
-
-def stylesheets
-  asset_paths("/public/**/*.scss", "/widgets/**/*.scss").collect do |f|
-    Sass.compile File.read(f)
-  end.join("\n")
-end
-
-def asset_paths(*paths)
-  paths.inject([]) { |arr, path| arr + Dir[File.join(Dir.pwd, path)] }
+def production?
+  ENV['RACK_ENV'] == 'production'
 end
 
 def send_event(id, body)
@@ -119,8 +102,8 @@ def first_dashboard
   files.first
 end
 
-Dir[File.join(Dir.pwd, 'lib', '**', '*.rb')].each {|file| require file }
+Dir[File.join(settings.root, 'lib', '**', '*.rb')].each {|file| require file }
 
 job_path = ENV["JOB_PATH"] || 'jobs'
-files = Dir[File.join(Dir.pwd, job_path, '/*.rb')]
+files = Dir[File.join(settings.root, job_path, '/*.rb')]
 files.each { |job| require(job) } 

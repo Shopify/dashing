@@ -1,3 +1,7 @@
+/*
+  //=require_directory .
+  //=require_tree ../../widgets
+*/
 // ----------------------------------------------------------------------------
 // Sass declarations
 // ----------------------------------------------------------------------------
@@ -39,7 +43,7 @@ html {
 
 body { 
   margin: 0; 
-  background: #fff; 
+  background-color: $background-color;
   font-size: 20px;
   color: $text-color;
   font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -47,6 +51,11 @@ body {
 
 b, strong { 
   font-weight: bold; 
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
 img { 
@@ -103,24 +112,30 @@ h3 {
 // ----------------------------------------------------------------------------
 // Base widget styles
 // ----------------------------------------------------------------------------
-#container { 
-  padding: 5px 0;
+.gridster {
+  margin: 0px auto;
 }
 
 .list-nostyle {
   list-style: none;
 }
 
-.widget-container {
-  float: left;
-  width: 100%;
+.gridster ul {
+  list-style: none;
 }
 
-.widget { 
-  padding: 20px 5%;
-  margin: 5px;
+.gs_w {
+  width: 100%;
+  display: table;
+  cursor: pointer;
+}
+
+.widget {
+  padding: 25px 12px;
   text-align: center;
-  background-color: $background-color;
+  width: 100%;
+  display: table-cell;
+  vertical-align: middle;
 }
 
 .widget.status-warning {
@@ -155,80 +170,54 @@ h3 {
   font-size: 15px;
 }
 
-// ----------------------------------------------------------------------------
-// Media queries: adjust number of columns based on screen width
-// ----------------------------------------------------------------------------
-@media only screen and (min-width: 480px) {
-  // # of columns = 2
-  // column-1     = 50%
-  // column-2     = 50%
-  .widget-container {
-    width: 50%;
-  }
-  .widget-value {
-    font-size: 40px;
+#save-gridster {
+  display: none;
+  position: fixed;
+  top: 0;
+  margin: 0px auto;
+  left: 50%;
+  z-index: 1000;
+  background: black;
+  width: 190px;
+  text-align: center;
+  border: 1px solid white;
+  border-top: 0px;
+  margin-left: -95px;
+  padding: 15px;
+}
+
+#save-gridster:hover {
+  padding-top: 25px;
+}
+
+#saving-instructions {
+  display: none;
+  padding: 10px;
+  width: 500px;
+  height: 122px;
+  z-index: 1000;
+  background: white;
+  top: 100px;
+  color: black;
+
+  textarea {
+    white-space: nowrap;
+    width: 494px;
+    height: 80px;
   }
 }
-@media only screen and (min-width: 768px) {
-  // # of columns = 3
-  // column-1     = 33%
-  // column-2     = 33%
-  // column-3     = 33% 
-  .widget-container:nth-child(3n+1) {
-    width: 33%;
-  }
-  .widget-container:nth-child(3n+2) {
-    width: 33%;
-  }
-  .widget-container:nth-child(3n+3) {
-    width: 33%;
-  }
-} 
-@media only screen and (min-width: 992px) {
-  // # of columns = 4
-  // column-1     = 25%
-  // column-2     = 25%
-  // column-3     = 25%  
-  // column-4     = 25%  
-  .widget-container:nth-child(4n+1) {
-    width: 25%;
-  }
-  .widget-container:nth-child(4n+2) {
-    width: 25%;
-  }
-  .widget-container:nth-child(4n+3) {
-    width: 25%;
-  }
-  .widget-container:nth-child(4n+4) {
-    width: 25%;
-  }
-  .widget-value {
-    font-size: 30px;
-  }
+
+#lean_overlay {
+    position: fixed;
+    z-index:100;
+    top: 0px;
+    left: 0px;
+    height:100%;
+    width:100%;
+    background: #000;
+    display: none;
 }
-@media only screen and (min-width: 1382px) {
-  // # of columns = 5
-  // column-1     = 20%
-  // column-2     = 20%
-  // column-3     = 20%  
-  // column-4     = 20%  
-  // column-5     = 20%  
-  .widget-container:nth-child(5n+1) {
-    width: 20%;
-  }
-  .widget-container:nth-child(5n+2) {
-    width: 20%;
-  }
-  .widget-container:nth-child(5n+3) {
-    width: 20%;
-  }
-  .widget-container:nth-child(5n+4) {
-    width: 20%;
-  }
-  .widget-container:nth-child(5n+5) {
-    width: 20%;
-  }
-}
+
 
 // ----------------------------------------------------------------------------
 // Clearfix

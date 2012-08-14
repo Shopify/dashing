@@ -8,34 +8,25 @@
 
   <title><%= yield_content(:title) %></title>
 
-  <script type="text/javascript"><%= javascripts %></script>
-  <script type="text/javascript" src="/javascripts/jquery.knob.js"></script>
-  <script type="text/javascript" src="/javascripts/jquery.masonry.min.js"></script>
+  <!-- The javascript and css are managed by sprockets. The files can be found in the /assets folder-->
+  <script type="text/javascript" src="/assets/application.js"></script>
+  <link rel="stylesheet" href="/assets/application.css">
 
-  <style><%= stylesheets %></style>
   <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="/stylesheets/font-awesome.css">
-  <link rel="icon" href="/images/favicon.ico">  
+  <link rel="icon" href="/assets/favicon.ico">
 
-  <script type="text/javascript">
-    var relayout = function() {
-      $('#container ul').masonry({ itemSelector: '.widget-container' });
-    }
-
-    Dashing.Widget.on('ready', function(){
-      setTimeout(function(){
-        relayout();
-      }, 0);
-    });
-
-    $(window).resize(relayout);
-  </script>
 </head>
-<body>
-
-  <div id="container">
-    <%= yield %>
-  </div>
-
-</body>
+  <body>
+    <div id="container">
+      <%= yield %>
+    </div>
+  
+    <% if development? %>
+      <div id="saving-instructions">
+        <p>Paste the following at the top of <i><%= params[:dashboard] %>.erb</i></p>
+        <textarea id="gridster-code"></textarea>
+      </div>
+      <a href="#saving-instructions" id="save-gridster">Save this layout</a>
+    <% end %>
+  </body>
 </html>
