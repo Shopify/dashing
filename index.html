@@ -52,17 +52,19 @@
       <h3 class="section-title">Introduction</h3>
       <a class="back-up-link" href="/">Back to top</a>
       <div class="section-content">
-        <p>Dashing is a framework for building web-based dashboards using coffeescript and ruby that you host yourself. We were tired of the lack of control we had over hosted dashboard solutions, so we uilt our own. With Dashing everything is source controlled and nothing is off limits.</p>
+        <p>Dashing is a framework for building self-hosted dashboards using coffeescript and ruby.</p>
 
         <p>Featuring:
         <ul>
           <li>Custom widgets! Built using whatever HTML/Coffeescript wizardry you posses</li>
-          <li>Multiple dashboards! You can have many different views all hosted in the same location</li>
+          <li>Multiple dashboards! You can have many different views into your data all hosted in the same location</li>
           <li>Shared widgets! It&rsquo;s easy to have have the same widget show up on different dashboards</li>
           <li>Push or pull data, you decide!</li>
-          <li>Responsive grid layout! Your dashboard will look good on any sized screen</li>
         </ul>
         </p>
+
+        <iframe src="http://pure-bastion-5332.herokuapp.com" width="800px"></iframe>
+        <p><a class="button" href="http://pure-bastion-5332.herokuapp.com">Sample</a></p>
       </div>
     </section>
 
@@ -96,7 +98,7 @@
       <div class="section-content">
         <p>Widgets are represented by a <code>div</code> element with <code>data-id</code> and <code>data-view</code> attributes. For example, the following is a valid widget:</p>
         <script src="https://gist.github.com/3317292.js?file=simple_widget.html"></script>
-
+        <img src="images/widget.png" alt="Widget">
         <p>The <code>data-id</code> attribute sets the <strong>widget ID</strong> which will be used to push data to the widget. Two widgets can have the same widget id, allowing you to have the same widget in multiple dashboards.</p>
 
         <p><code>data-view</code> specifies the type of widget what will be used. This field is case sensitive and must match the <a href="#coffeescript">coffeescript class</a> of the widget. See below.</p>
@@ -144,6 +146,8 @@
       <div class="section-content">
 
         <p>Providing data to widgets is easy. You specify which widget you want using a widget id. Dashing expects the data you send to be in JSON format. Upon getting data, dashing mixes the json into the widget object. So it&rsquo;s easy to update multiple attributes within the same object.</p>
+
+        <p>Dashing uses <a href="en.wikipedia.org/wiki/Server-sent_events">Server Sent Events</a> in order to stream data to multiple dashboards simultaneously. It also means that when you open a dashboard in a new window or location, the current data gets pushed directly to it, no waiting around.</p>
 
         <h4>Jobs</h4>
 
