@@ -1,5 +1,9 @@
-SCHEDULER.every '5s' do
-    send_event('synergy',        { value: (rand * 1024).floor })
-    send_event('convergence',    { value: (rand * 1024).floor })
-    send_event('paradigm_shift', { value: (rand * 1024).floor })
+current_valuation = 0
+
+SCHEDULER.every '2s' do
+  last_valuation = current_valuation
+  current_valuation = rand(100)
+
+  send_event('valuation', { current: current_valuation, last: last_valuation })
+  send_event('synergy',   { value: rand(100) })
 end

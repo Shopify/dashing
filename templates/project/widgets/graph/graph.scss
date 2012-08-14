@@ -1,35 +1,51 @@
 // ----------------------------------------------------------------------------
 // Sass declarations
 // ----------------------------------------------------------------------------
-$background-color:  #00b1a4;
+$background-color:  #2e864f;
 $value-color:       #fff;
 
 $title-color:       lighten($background-color, 75%);
 $moreinfo-color:    lighten($background-color, 45%);
 
+$graph_color:       lighten($background-color, 75%);
+
 // ----------------------------------------------------------------------------
-// Widget-number styles
+// Widget-graph styles
 // ----------------------------------------------------------------------------
-.widget-number { 
+.widget-graph { 
 
   background-color: $background-color;
-  
+  position: relative;
+
+  svg {
+    color: $graph_color;
+    opacity: 0.4;
+    fill-opacity: 0.4;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .title, .value {
+    position: relative;
+    z-index: 99;
+  }
+
   .title { 
     color: $title-color;
   }
 
-  .value {
-    color: $value-color;
-  }
-
-  .change-rate {
-    font-weight: 300;
-    font-size: 30px;
-    color: $value-color;
-  }
-
   .text-moreinfo {
     color: $moreinfo-color;
+    font-weight: 600;
+    font-size: 20px;
+    margin-top: 0;
   }
-  
+
+  .x_tick {
+    position: absolute;
+    bottom: 0;
+  }
+
 }

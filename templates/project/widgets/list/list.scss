@@ -1,27 +1,29 @@
 // ----------------------------------------------------------------------------
 // Sass declarations
 // ----------------------------------------------------------------------------
-$widget-list_background-color:  #12b0c5;
-$widget-list_value-color:       #fff;
 
-$widget-list_title-color:       lighten($widget-list_background-color, 45%);
-$widget-list_label-color:       lighten($widget-list_background-color, 45%);
+$background-color:  #12b0c5;
+$value-color:       #fff;
+
+$title-color:       lighten($background-color, 45%);
+$label-color:       lighten($background-color, 45%);
 
 // ----------------------------------------------------------------------------
 // Widget-list styles
 // ----------------------------------------------------------------------------
 .widget-list { 
 
-  background-color: $widget-list_background-color;
+  background-color: $background-color;
+  vertical-align: top;
 
   .title { 
-    color: $widget-list_title-color;
+    color: $title-color;
   }
 
   ol, ul {
     margin: 0 15px;
     text-align: left;
-    color: $widget-list_label-color;
+    color: $label-color;
   }
 
   ol {
@@ -37,14 +39,14 @@ $widget-list_label-color:       lighten($widget-list_background-color, 45%);
   }
 
   .label {
-    color: $widget-list_label-color;    
+    color: $label-color;    
   }
 
   .value {
     float: right;
     margin-left: 12px;
     font-weight: 600;
-    color: $widget-list_value-color;
+    color: $value-color;
   }
 
 }

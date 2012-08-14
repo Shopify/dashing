@@ -1,5 +1,8 @@
-<ul class="list-nostyle clearfix">
-  <li class="widget-container">
-    <div data-id="widget_id" data-view="MyWidget"></div>
-  </li>
-</ul>
+<% content_for(:title) { "My super sweet dashboard" } %>
+<div class="gridster">
+  <ul>
+    <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+      <div data-id="my_widget" data-view="Text"></div>
+    </li>
+  </ul>
+</div>
