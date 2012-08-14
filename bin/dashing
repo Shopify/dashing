@@ -44,13 +44,13 @@ module Dashing
       File.expand_path('../../templates', __FILE__)
     end
 
-    desc "new PROJECT_NAME", "Sets up ALL THE THINGS needed for your dashboard project structure."
+    desc "new PROJECT_NAME", "Sets up ALL THE THINGS needed for your dashboard project."
     def new(name)
       @name = Thor::Util.snake_case(name)
       directory :project, @name
     end
 
-    desc "generate GENERATOR NAME", "Creates a new wigdget, dashboard, or job."
+    desc "generate (widget/dashboard/job) NAME", "Creates a new widget, dashboard, or job."
     def generate(type, name)
       send("generate_#{type}".to_sym, name)
     rescue NoMethodError => e
@@ -68,7 +68,7 @@ module Dashing
     end
     map "s" => :start
 
-    desc "job JOB_NAME AUTH_TOKEN(optional)", "Runs the specified job."
+    desc "job JOB_NAME AUTH_TOKEN(optional)", "Runs the specified job. Make sure to supply your auth token if you have one set."
     def job(name, auth_token = "")
       Dir[File.join(Dir.pwd, 'lib/**/*.rb')].each {|file| require file }
       self.class.auth_token = auth_token
