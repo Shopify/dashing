@@ -45,9 +45,13 @@ class Dashing.Widget extends Batman.View
   @::on 'ready', ->
     Dashing.Widget.fire 'ready'
 
-  onData: (data) =>
+  receiveData: (data) =>
     @mixin(data)
+    @set 'updatedAt', new Date()
+    @onData(data)
 
+  onData: (data) =>
+    # Widgets override this to handle incoming data
 
 Dashing.AnimatedValue =
   get: Batman.Property.defaultAccessor.get
@@ -89,7 +93,7 @@ source.addEventListener 'message', (e) =>
   lastEvents[data.id] = data
   if widgets[data.id]?.length > 0
     for widget in widgets[data.id]
-      widget.onData(data)
+      widget.receiveData(data)
 
 
 $(document).ready ->
