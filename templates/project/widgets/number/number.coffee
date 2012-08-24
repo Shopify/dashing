@@ -20,6 +20,5 @@ class Dashing.Number extends Dashing.Widget
     @get('status') == 'warning' || @get('status') == 'danger'
 
   onData: (data) ->
-    super
     if data.status
       $(@get('node')).addClass("status-#{data.status}")

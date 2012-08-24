@@ -20,7 +20,6 @@ class Dashing.Graph extends Dashing.Widget
     @graph.render()
 
   onData: (data) ->
-    super
     if @graph
       @graph.series[0].data = data.points
       @graph.render()
