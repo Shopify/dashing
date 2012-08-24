@@ -81,6 +81,7 @@ end
 
 def send_event(id, body)
   body["id"] = id
+  body["updatedAt"] = Time.now
   event = format_event(JSON.unparse(body))
   settings.history[id] = event
   settings.connections.each { |out| out << event }

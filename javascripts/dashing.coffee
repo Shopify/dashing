@@ -47,7 +47,6 @@ class Dashing.Widget extends Batman.View
 
   receiveData: (data) =>
     @mixin(data)
-    @set 'updatedAt', new Date()
     @onData(data)
 
   onData: (data) =>
