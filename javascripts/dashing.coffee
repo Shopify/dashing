@@ -41,6 +41,10 @@ class Dashing.Widget extends Batman.View
     type = Batman.Filters.dashize(@view)
     $(@node).addClass("widget widget-#{type} #{@id}")
 
+  @accessor 'updatedAtMessage', ->
+    if updatedAt = @get('updatedAt')
+      timestamp = updatedAt.toString().match(/\d*:\d*/)[0]
+      "Last updated at #{timestamp}"
 
   @::on 'ready', ->
     Dashing.Widget.fire 'ready'
