@@ -82,7 +82,7 @@ end
 def send_event(id, body)
   body["id"] = id
   body["updatedAt"] = Time.now
-  event = format_event(JSON.unparse(body))
+  event = format_event(body.to_json)
   settings.history[id] = event
   settings.connections.each { |out| out << event }
 end
@@ -104,6 +104,7 @@ def first_dashboard
 end
 
 Dir[File.join(settings.root, 'lib', '**', '*.rb')].each {|file| require file }
+{}.to_json # Forces your json codec to initialize (in the event that it is lazily loaded). Does this before job threads start.
 
 job_path = ENV["JOB_PATH"] || 'jobs'
 files = Dir[File.join(settings.root, job_path, '/*.rb')]
