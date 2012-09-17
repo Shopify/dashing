@@ -59,12 +59,14 @@ class Dashing.Widget extends Batman.View
 Dashing.AnimatedValue =
   get: Batman.Property.defaultAccessor.get
   set: (k, to) ->
-    if isNaN(to)
+    if !to? || isNaN(to)
       @[k] = to
     else
       timer = "interval_#{k}"
-      num = if !isNaN(@[k]) then @[k] else 0
+      num = if (!isNaN(@[k]) && @[k]?) then @[k] else 0
       unless @[timer] || num == to
+        to = parseFloat(to)
+        num = parseFloat(num)
         up = to > num
         num_interval = Math.abs(num - to) / 90
         @[timer] = 
