@@ -81,6 +81,7 @@ Dashing.AnimatedValue =
 
 Dashing.widgets = widgets = {}
 Dashing.lastEvents = lastEvents = {}
+Dashing.debugMode = false
 
 source = new EventSource('/events')
 source.addEventListener 'open', (e) ->
@@ -93,6 +94,8 @@ source.addEventListener 'error', (e)->
 
 source.addEventListener 'message', (e) =>
   data = JSON.parse(e.data)
+  if Dashing.debugMode
+    console.log("Received data for #{data.id}", data)
   lastEvents[data.id] = data
   if widgets[data.id]?.length > 0
     for widget in widgets[data.id]
