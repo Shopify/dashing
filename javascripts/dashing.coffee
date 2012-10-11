@@ -25,7 +25,8 @@ Batman.Filters.shortenedNumber = (num) ->
     num
 
 class window.Dashing extends Batman.App
-  @root -> 
+  @root ->
+Dashing.params = Batman.URI.paramsFromQuery(window.location.search.slice(1));
 
 class Dashing.Widget extends Batman.View
   constructor:  ->
