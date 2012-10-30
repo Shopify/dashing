@@ -267,6 +267,16 @@ code {
   .gist-meta a:hover {
     text-decoration: underline; }
 
+.widgets {
+  margin: 0px auto;
+  width: 755px;
+  margin-bottom: 10px;
+}
+
+.widgets img {
+  border: 1px solid black;
+}
+
 .section-box {
   margin: 0 0 45px;
   position: relative; }
