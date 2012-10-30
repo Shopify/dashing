@@ -22,3 +22,4 @@ Dashing.on 'ready', ->
       avoid_overlapped_widgets: !Dashing.customGridsterLayout
       draggable:
         stop: Dashing.showGridsterInstructions
+        start: -> Dashing.currentWidgetPositions = Dashing.getWidgetPositions()
