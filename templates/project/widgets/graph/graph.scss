@@ -1,13 +1,12 @@
 // ----------------------------------------------------------------------------
 // Sass declarations
 // ----------------------------------------------------------------------------
-$background-color:  #2e864f;
-$value-color:       #fff;
+$background-color:  #dc5945;
 
-$title-color:       lighten($background-color, 75%);
-$moreinfo-color:    lighten($background-color, 45%);
+$title-color:       rgba(255, 255, 255, 0.7);
+$moreinfo-color:    rgba(255, 255, 255, 0.3);
+$tick-color:        rgba(0, 0, 0, 0.4);
 
-$graph_color:       lighten($background-color, 75%);
 
 // ----------------------------------------------------------------------------
 // Widget-graph styles
@@ -17,14 +16,13 @@ $graph_color:       lighten($background-color, 75%);
   background-color: $background-color;
   position: relative;
 
+
   svg {
-    color: $graph_color;
+    position: absolute;
     opacity: 0.4;
     fill-opacity: 0.4;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    left: 0px;
+    top: 0px;
   }
 
   .title, .value {
@@ -36,7 +34,7 @@ $graph_color:       lighten($background-color, 75%);
     color: $title-color;
   }
 
-  .text-moreinfo {
+  .more-info {
     color: $moreinfo-color;
     font-weight: 600;
     font-size: 20px;
@@ -46,6 +44,22 @@ $graph_color:       lighten($background-color, 75%);
   .x_tick {
     position: absolute;
     bottom: 0;
+    .title {
+      font-size: 20px;
+      color: $tick-color;
+      opacity: 0.5;
+      padding-bottom: 3px;
+    }
+  }
+  
+  .y_ticks {
+    font-size: 20px;
+    fill: $tick-color;
+    fill-opacity: 1;
+  }
+
+  .domain {
+    display: none;
   }
 
 }

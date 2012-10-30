@@ -95,11 +95,11 @@ h1 {
   margin-bottom: 12px;
   text-align: center;
   font-size: 30px;
-  font-weight: 300;
+  font-weight: 400;
 }
 h2 {
   text-transform: uppercase;
-  font-size: 80px;
+  font-size: 76px;
   font-weight: 700;
   color: $text-color;
 }
@@ -114,6 +114,16 @@ h3 {
 // ----------------------------------------------------------------------------
 .gridster {
   margin: 0px auto;
+}
+
+.icon-background {
+  width: 100%!important;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0.1;
+  font-size: 275px;
 }
 
 .list-nostyle {
@@ -146,7 +156,7 @@ h3 {
     display: inline-block;
   }
 
-  .title, .text-moreinfo {
+  .title, .more-info {
     color: $text-warning-color;
   }
 }
@@ -160,14 +170,25 @@ h3 {
     display: inline-block;
   }
 
-  .title, .text-moreinfo {
+  .title, .more-info {
     color: $text-danger-color;
   }
 }
 
-.text-moreinfo {
-  margin-top: 12px;
+.more-info {
   font-size: 15px;
+  position: absolute;
+  bottom: 32px;
+  left: 0;
+  right: 0;
+}
+
+.updated-at {
+  font-size: 15px;
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
 }
 
 #save-gridster {
@@ -220,6 +241,10 @@ h3 {
     display: none;
 }
 
+#container {
+  padding-top: 5px;
+}
+
 
 // ----------------------------------------------------------------------------
 // Clearfix
@@ -227,3 +252,4 @@ h3 {
 .clearfix:before, .clearfix:after { content: "\0020"; display: block; height: 0; overflow: hidden; }
 .clearfix:after { clear: both; }
 .clearfix { zoom: 1; }
+

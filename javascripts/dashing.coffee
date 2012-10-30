@@ -14,7 +14,7 @@ Batman.Filters.dashize = (str) ->
   return str.replace(dashes_rx1, '$1_$2').replace(dashes_rx2, '$1_$2').replace('_', '-').toLowerCase()
 
 Batman.Filters.shortenedNumber = (num) ->
-  return if isNaN(num)
+  return num if isNaN(num)
   if num >= 1000000000
     (num / 1000000000).toFixed(1) + 'B'
   else if num >= 1000000

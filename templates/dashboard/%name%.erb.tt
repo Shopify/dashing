@@ -1,4 +1,3 @@
-<% content_for(:title) { "My super sweet dashboard" } %>
 <div class="gridster">
   <ul>
     <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">

@@ -1,3 +1,4 @@
+# Populate the graph with some random points
 points = []
 (1..10).each do |i|
   points << { x: i, y: rand(50) }

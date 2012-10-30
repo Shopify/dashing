@@ -1,0 +1,1 @@
+<iframe data-bind-src="url" frameborder=0></iframe>

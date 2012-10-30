@@ -1,15 +1,12 @@
 // ----------------------------------------------------------------------------
 // Sass declarations
 // ----------------------------------------------------------------------------
-
 $background-color:  #9c4274;
-$value-color:       #fff;
 
-$title-color:       lighten($background-color, 75%);
-$moreinfo-color:    lighten($background-color, 45%);
+$title-color:       rgba(255, 255, 255, 0.7);
+$moreinfo-color:    rgba(255, 255, 255, 0.3);
 
-$meter-background:  darken($background-color, 10%);
-$meter-foreground:  lighten($background-color, 75%);
+$meter-background:  darken($background-color, 15%);
 
 // ----------------------------------------------------------------------------
 // Widget-meter styles
@@ -20,18 +17,19 @@ $meter-foreground:  lighten($background-color, 75%);
   
   input.meter { 
     background-color: $meter-background;
-    color: $meter-foreground;
+    color: #fff;
   }
 
   .title { 
     color: $title-color;
   }
 
-  .text-moreinfo {
+  .more-info {
     color: $moreinfo-color;
-    font-weight: 600;
-    font-size: 20px;
-    margin-top: 0;
+  }
+
+  .updated-at {
+    color: rgba(0, 0, 0, 0.3);
   }
   
 }

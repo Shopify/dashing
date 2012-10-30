@@ -1,12 +1,12 @@
 // ----------------------------------------------------------------------------
 // Sass declarations
 // ----------------------------------------------------------------------------
-
 $background-color:  #12b0c5;
 $value-color:       #fff;
 
-$title-color:       lighten($background-color, 45%);
-$label-color:       lighten($background-color, 45%);
+$title-color:       rgba(255, 255, 255, 0.7);
+$label-color:       rgba(255, 255, 255, 0.7);
+$moreinfo-color:    rgba(255, 255, 255, 0.7);
 
 // ----------------------------------------------------------------------------
 // Widget-list styles
@@ -47,6 +47,14 @@ $label-color:       lighten($background-color, 45%);
     margin-left: 12px;
     font-weight: 600;
     color: $value-color;
+  }
+
+  .updated-at {
+    color: rgba(0, 0, 0, 0.3);
+  }
+
+  .more-info {
+    color: $moreinfo-color;
   }
 
 }

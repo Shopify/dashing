@@ -1,5 +1,57 @@
 (function() {
 
+  Batman.extend(Batman.DOM, {
+    querySelectorAll: function(node, selector) {
+      return jQuery(selector, node);
+    },
+    querySelector: function(node, selector) {
+      return jQuery(selector, node)[0];
+    },
+    setInnerHTML: function(node, html) {
+      var child, childNodes, result, _i, _j, _len, _len1;
+      childNodes = (function() {
+        var _i, _len, _ref, _results;
+        _ref = node.childNodes;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          child = _ref[_i];
+          _results.push(child);
+        }
+        return _results;
+      })();
+      for (_i = 0, _len = childNodes.length; _i < _len; _i++) {
+        child = childNodes[_i];
+        Batman.DOM.willRemoveNode(child);
+      }
+      result = jQuery(node).html(html);
+      for (_j = 0, _len1 = childNodes.length; _j < _len1; _j++) {
+        child = childNodes[_j];
+        Batman.DOM.didRemoveNode(child);
+      }
+      return result;
+    },
+    removeNode: function(node) {
+      var _ref;
+      Batman.DOM.willRemoveNode(node);
+      if ((_ref = node.parentNode) != null) {
+        _ref.removeChild(node);
+      }
+      return Batman.DOM.didRemoveNode(node);
+    },
+    destroyNode: function(node) {
+      Batman.DOM.willDestroyNode(node);
+      Batman.DOM.willRemoveNode(node);
+      jQuery(node).remove();
+      Batman.DOM.didRemoveNode(node);
+      return Batman.DOM.didDestroyNode(node);
+    },
+    appendChild: function(parent, child) {
+      Batman.DOM.willInsertNode(child);
+      jQuery(parent).append(child);
+      return Batman.DOM.didInsertNode(child);
+    }
+  });
+
   Batman.Request.prototype._parseResponseHeaders = function(xhr) {
     var headers;
     return headers = xhr.getAllResponseHeaders().split('\n').reduce(function(acc, header) {
