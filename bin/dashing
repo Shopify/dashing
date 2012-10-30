@@ -14,7 +14,7 @@ def send_event(id, data)
   req = Net::HTTP::Post.new("/widgets/#{id}")
   req["content-type"] = "application/json"
   req.body = JSON.unparse(data.merge(:auth_token => Dashing::CLI.auth_token))
-  res = Net::HTTP.new('localhost', 3000).start { |http| http.request(req) }
+  res = Net::HTTP.new('localhost', 3030).start { |http| http.request(req) }
   puts "Data Sent to #{id}: #{data}"
 end
 
@@ -61,8 +61,9 @@ module Dashing
     desc "start", "Starts the server in style!"
     method_option :job_path, :desc => "Specify the directory where jobs are stored"
     def start(*args)
+      port_option = args.include?('-p')? '' : ' -p 3030'
       args = args.join(" ")
-      command = "bundle exec thin -R config.ru start #{args}"
+      command = "bundle exec thin -R config.ru start #{port_option} #{args}"
       command.prepend "export JOB_PATH=#{options[:job_path]}; " if options[:job_path]
       system(command)
     end
