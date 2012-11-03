@@ -44,7 +44,7 @@ class Dashing.Widget extends Batman.View
 
   @accessor 'updatedAtMessage', ->
     if updatedAt = @get('updatedAt')
-      timestamp = updatedAt.toString().match(/\d*:\d*/)[0]
+      timestamp = new Date(updatedAt.toString()).toTimeString()
       "Last updated at #{timestamp}"
 
   @::on 'ready', ->
