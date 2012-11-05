@@ -81,9 +81,22 @@ get '/views/:widget?.html' do
   end
 end
 
+post '/reload' do
+  request.body.rewind
+  body = JSON.parse(request.body.read)
+  auth_token = body.delete("auth_token")
+  if !settings.auth_token || settings.auth_token == auth_token
+    send_event('/reload', body)
+    204 # response without entity body
+  else
+    status 401
+    "Invalid API key\n"
+  end
+end
+
 post '/widgets/:id' do
   request.body.rewind
-  body =  JSON.parse(request.body.read)
+  body = JSON.parse(request.body.read)
   auth_token = body.delete("auth_token")
   if !settings.auth_token || settings.auth_token == auth_token
     send_event(params['id'], body)
@@ -110,7 +123,7 @@ def send_event(id, body)
   body[:id] = id
   body[:updatedAt] ||= Time.now.to_i
   event = format_event(body.to_json)
-  Sinatra::Application.settings.history[id] = event
+  Sinatra::Application.settings.history[id] = event unless id =~ /^\//
   Sinatra::Application.settings.connections.each { |out| out << event }
 end
 
