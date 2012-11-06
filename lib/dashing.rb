@@ -58,9 +58,22 @@ get '/views/:widget?.html' do
   send_file File.join(settings.root, 'widgets', widget, "#{widget}.html")
 end
 
+post '/reload' do
+  request.body.rewind
+  body = JSON.parse(request.body.read)
+  auth_token = body.delete("auth_token")
+  if !settings.auth_token || settings.auth_token == auth_token
+    send_event('/reload', body)
+    204 # response without entity body
+  else
+    status 401
+    "Invalid API key\n"
+  end
+end
+
 post '/widgets/:id' do
   request.body.rewind
-  body =  JSON.parse(request.body.read)
+  body = JSON.parse(request.body.read)
   auth_token = body.delete("auth_token")
   if !settings.auth_token || settings.auth_token == auth_token
     send_event(params['id'], body)
@@ -83,7 +96,7 @@ def send_event(id, body)
   body["id"] = id
   body["updatedAt"] = Time.now
   event = format_event(body.to_json)
-  settings.history[id] = event
+  settings.history[id] = event unless id =~ /^\//
   settings.connections.each { |out| out << event }
 end
 
@@ -108,4 +121,4 @@ Dir[File.join(settings.root, 'lib', '**', '*.rb')].each {|file| require file }
 
 job_path = ENV["JOB_PATH"] || 'jobs'
 files = Dir[File.join(settings.root, job_path, '/*.rb')]
-files.each { |job| require(job) } 
+files.each { |job| require(job) }
