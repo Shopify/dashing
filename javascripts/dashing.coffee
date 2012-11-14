@@ -70,7 +70,7 @@ Dashing.AnimatedValue =
         num = parseFloat(num)
         up = to > num
         num_interval = Math.abs(num - to) / 90
-        @[timer] = 
+        @[timer] =
           setInterval =>
             num = if up then Math.ceil(num+num_interval) else Math.floor(num-num_interval)
             if (up && num > to) || (!up && num < to)
@@ -80,7 +80,8 @@ Dashing.AnimatedValue =
               delete @[timer]
             @[k] = num
             @set k, to
-      @[k] = num    
+          , 10
+      @[k] = num
 
 Dashing.widgets = widgets = {}
 Dashing.lastEvents = lastEvents = {}
