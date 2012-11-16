@@ -11,16 +11,16 @@ $meter-background:  darken($background-color, 15%);
 // ----------------------------------------------------------------------------
 // Widget-meter styles
 // ----------------------------------------------------------------------------
-.widget-meter { 
+.widget-meter {
 
   background-color: $background-color;
-  
-  input.meter { 
+
+  input.meter {
     background-color: $meter-background;
     color: #fff;
   }
 
-  .title { 
+  .title {
     color: $title-color;
   }
 
@@ -31,5 +31,5 @@ $meter-background:  darken($background-color, 15%);
   .updated-at {
     color: rgba(0, 0, 0, 0.3);
   }
-  
+
 }

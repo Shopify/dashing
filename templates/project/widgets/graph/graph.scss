@@ -11,7 +11,7 @@ $tick-color:        rgba(0, 0, 0, 0.4);
 // ----------------------------------------------------------------------------
 // Widget-graph styles
 // ----------------------------------------------------------------------------
-.widget-graph { 
+.widget-graph {
 
   background-color: $background-color;
   position: relative;
@@ -30,7 +30,7 @@ $tick-color:        rgba(0, 0, 0, 0.4);
     z-index: 99;
   }
 
-  .title { 
+  .title {
     color: $title-color;
   }
 
@@ -51,7 +51,7 @@ $tick-color:        rgba(0, 0, 0, 0.4);
       padding-bottom: 3px;
     }
   }
-  
+
   .y_ticks {
     font-size: 20px;
     fill: $tick-color;
