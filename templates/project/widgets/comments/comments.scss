@@ -9,11 +9,11 @@ $moreinfo-color:    rgba(255, 255, 255, 0.7);
 // ----------------------------------------------------------------------------
 // Widget-comment styles
 // ----------------------------------------------------------------------------
-.widget-comments { 
+.widget-comments {
 
   background-color: $background-color;
-  
-  .title { 
+
+  .title {
     color: $title-color;
     margin-bottom: 15px;
   }
@@ -29,5 +29,5 @@ $moreinfo-color:    rgba(255, 255, 255, 0.7);
   .more-info {
     color: $moreinfo-color;
   }
-  
+
 }
