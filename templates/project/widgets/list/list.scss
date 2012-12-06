@@ -11,12 +11,12 @@ $moreinfo-color:    rgba(255, 255, 255, 0.7);
 // ----------------------------------------------------------------------------
 // Widget-list styles
 // ----------------------------------------------------------------------------
-.widget-list { 
+.widget-list {
 
   background-color: $background-color;
   vertical-align: top;
 
-  .title { 
+  .title {
     color: $title-color;
   }
 
@@ -39,7 +39,7 @@ $moreinfo-color:    rgba(255, 255, 255, 0.7);
   }
 
   .label {
-    color: $label-color;    
+    color: $label-color;
   }
 
   .value {

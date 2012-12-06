@@ -9,11 +9,11 @@ $moreinfo-color:    rgba(255, 255, 255, 0.7);
 // ----------------------------------------------------------------------------
 // Widget-text styles
 // ----------------------------------------------------------------------------
-.widget-text { 
+.widget-text {
 
   background-color: $background-color;
-  
-  .title { 
+
+  .title {
     color: $title-color;
   }
 
@@ -24,7 +24,7 @@ $moreinfo-color:    rgba(255, 255, 255, 0.7);
   .updated-at {
     color: rgba(255, 255, 255, 0.7);
   }
-  
+
 
   &.large h3 {
     font-size: 65px;
