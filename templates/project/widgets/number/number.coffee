@@ -17,4 +17,4 @@ class Dashing.Number extends Dashing.Widget
 
   onData: (data) ->
     if data.status
-      $(@get('node')).addClass("status-#{data.status}")
+      $(@get('node')).removeClass("status-danger status-warning").addClass("status-#{data.status}")
