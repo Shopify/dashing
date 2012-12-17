@@ -24,5 +24,6 @@ Gem::Specification.new do |s|
   s.add_dependency('rufus-scheduler')
   s.add_dependency('thor')
   s.add_dependency('sprockets')
+  s.add_dependency('xml-simple')
 
 end
