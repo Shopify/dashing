@@ -1,10 +1,12 @@
-require 'sinatra'
-require 'sprockets'
-require 'sinatra/content_for'
-require 'rufus/scheduler'
 require 'coffee-script'
-require 'sass'
+require 'haml'
 require 'json'
+require 'rufus/scheduler'
+require 'sass'
+require 'sinatra'
+require 'sinatra/content_for'
+require 'sinatra/respond_with'
+require 'sprockets'
 
 SCHEDULER = Rufus::Scheduler.start_new
 
@@ -49,7 +51,7 @@ end
 
 get '/:dashboard' do
   protected!
-  erb params[:dashboard].to_sym
+  respond_with params[:dashboard].to_sym
 end
 
 get '/views/:widget?.html' do
@@ -108,4 +110,4 @@ Dir[File.join(settings.root, 'lib', '**', '*.rb')].each {|file| require file }
 
 job_path = ENV["JOB_PATH"] || 'jobs'
 files = Dir[File.join(settings.root, job_path, '/*.rb')]
-files.each { |job| require(job) } 
+files.each { |job| require(job) }

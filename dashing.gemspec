@@ -16,13 +16,14 @@ Gem::Specification.new do |s|
 
   s.files = Dir['README.md', 'javascripts/**/*', 'templates/**/*','templates/**/.[a-z]*', 'lib/**/*']
 
-  s.add_dependency('sass')
   s.add_dependency('coffee-script')
+  s.add_dependency('haml')
+  s.add_dependency('rufus-scheduler')
+  s.add_dependency('sass')
   s.add_dependency('sinatra')
   s.add_dependency('sinatra-contrib')
-  s.add_dependency('thin')
-  s.add_dependency('rufus-scheduler')
-  s.add_dependency('thor')
   s.add_dependency('sprockets')
+  s.add_dependency('thin')
+  s.add_dependency('thor')
 
 end
