@@ -152,7 +152,7 @@
         <script src="https://gist.github.com/3978186.js?file=number.coffee"></script>
 
         <p>By default, whenever a widget receives JSON data, it mixes in the received data onto itself. This means that if you pass in data with a <code>title</code> attribute, the widget's <code>title</code> variable will change, and so will all DOM elements bound to it. No need to handle that yourself.</p>
-        
+
         <h4 id="positioning">Laying out the widgets</h4>
 
         <p>Dashing uses <a href="http://gridster.net/" target="_blank">gridster.js</a> to create a layout for your widgets. Each widget is part of an unordered list. The <code>&lt;li&gt;</code> element for a widget contains:</p>
@@ -186,7 +186,7 @@
         <p>You send data using the following method:</p>
         <code>send_event(widget_id, json_formatted_data)</code>
         <br/>
-        <p>Jobs are where you put stuff such as fetching metrics from a database, or calling a third party API like Twitter. Since the data fetch is happening in only one place, it means that all instances of widgets are in sync. <a href="en.wikipedia.org/wiki/Server-sent_events">Server Sent Events</a> are used in order to stream data to the dashboards. </p>
+        <p>Jobs are where you put stuff such as fetching metrics from a database, or calling a third party API like Twitter. Since the data fetch is happening in only one place, it means that all instances of widgets are in sync. <a href="http://www.html5rocks.com/en/tutorials/eventsource/basics/">Server Sent Events</a> are used in order to stream data to the dashboards. </p>
         <h4>API</h4>
 
         <p>You can also push data directly to your dashboard! Post the data you want in json to <code>/widgets/widget_id</code>.
