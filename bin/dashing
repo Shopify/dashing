@@ -78,7 +78,7 @@ module Dashing
     end
 
     def method_missing(meth, *args)
-      meth = meth.to_s
+      meth = "dashing:#{meth.to_s}"
 
       lookup(meth)
       klass, task = Thor::Util.find_class_and_task_by_namespace(meth)
