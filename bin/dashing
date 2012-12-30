@@ -77,11 +77,11 @@ module Dashing
       require f
     end
 
-    def method_missing(meth, *args)
-      meth = "dashing:#{meth.to_s}"
+    def method_missing(method, *args)
+      method = "dashing:#{meth.to_s}"
 
-      lookup(meth)
-      klass, task = Thor::Util.find_class_and_task_by_namespace(meth)
+      lookup(method)
+      klass, task = Thor::Util.find_class_and_task_by_namespace(method)
       self.class.handle_no_task_error(task, false) if klass.nil?
       args.unshift(task) if task
       klass.start(args, :shell => self.shell)
