@@ -50,7 +50,7 @@ module Dashing
       directory :project, @name
     end
 
-    desc "generate (widget/dashboard/job) NAME", "Creates a new widget, dashboard, or job."
+    desc "generate(:TEMPLATE) (widget/dashboard/job) NAME", "Creates a new widget, dashboard, or job."
     def generate(type, name)
       send("generate_#{type}".to_sym, name)
     rescue NoMethodError => e
