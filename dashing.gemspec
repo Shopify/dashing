@@ -2,8 +2,8 @@
 
 Gem::Specification.new do |s|
   s.name        = 'dashing'
-  s.version     = '1.0'
-  s.date        = '2012-10-30'
+  s.version     = '1.0.2'
+  s.date        = '2013-01-10'
   s.executables << 'dashing'
 
 
@@ -24,5 +24,6 @@ Gem::Specification.new do |s|
   s.add_dependency('rufus-scheduler')
   s.add_dependency('thor')
   s.add_dependency('sprockets')
+  s.add_dependency('rack', ['>= 1.3.6', '< 1.4.2']) # Use this temporarily until sinatra supports Rack 1.4.2+
 
 end
