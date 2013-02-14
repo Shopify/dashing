@@ -50,7 +50,7 @@ module Dashing
       directory :project, @name
     end
 
-    desc "generate (widget/dashboard/job) NAME", "Creates a new widget, dashboard, or job."
+    desc "generate(:TEMPLATE) (widget/dashboard/job) NAME", "Creates a new widget, dashboard, or job."
     def generate(type, name)
       send("generate_#{type}".to_sym, name)
     rescue NoMethodError => e
@@ -76,7 +76,31 @@ module Dashing
       f = File.join(Dir.pwd, "jobs", "#{name}.rb")
       require f
     end
-  
+
+    def method_missing(method, *args)
+      method = "dashing:#{meth.to_s}"
+
+      lookup(method)
+      klass, task = Thor::Util.find_class_and_task_by_namespace(method)
+      self.class.handle_no_task_error(task, false) if klass.nil?
+      args.unshift(task) if task
+      klass.start(args, :shell => self.shell)
+    end
+
+    private
+
+    def lookup(namespace)
+      pieces = namespace.split(':')
+      pieces.pop
+      path = pieces.join('/')
+      begin
+        require path
+      rescue LoadError => e
+        raise unless e.message =~ /#{Regexp.escape(path)}$/
+      rescue Exception => e
+        warn "[WARNING] Could not load generator #{path.inspect}. Error: #{e.message}.\n#{e.backtrace.join("\n")}"
+      end
+    end
   end
 end
 
