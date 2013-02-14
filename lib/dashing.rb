@@ -49,7 +49,11 @@ end
 
 get '/:dashboard' do
   protected!
-  erb params[:dashboard].to_sym
+  begin
+    erb params[:dashboard].to_sym
+  rescue Errno::ENOENT
+    halt 404, "no such dashboard"
+  end
 end
 
 get '/views/:widget?.html' do
