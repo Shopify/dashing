@@ -49,7 +49,11 @@ end
 
 get '/:dashboard' do
   protected!
-  erb params[:dashboard].to_sym
+  if File.exist? File.join(settings.views, "#{params[:dashboard]}.erb")
+    erb params[:dashboard].to_sym
+  else
+    halt 404
+  end
 end
 
 get '/views/:widget?.html' do
@@ -69,6 +73,10 @@ post '/widgets/:id' do
     status 401
     "Invalid API key\n"
   end
+end
+
+not_found do
+  send_file File.join(settings.public_folder, '404.html')
 end
 
 def development?
