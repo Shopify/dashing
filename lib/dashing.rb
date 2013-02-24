@@ -5,6 +5,7 @@ require 'rufus/scheduler'
 require 'coffee-script'
 require 'sass'
 require 'json'
+require 'httparty'
 
 SCHEDULER = Rufus::Scheduler.start_new
 
@@ -62,6 +63,21 @@ get '/views/:widget?.html' do
   send_file File.join(settings.root, 'widgets', widget, "#{widget}.html")
 end
 
+get '/remote_views/:widget_path?.:format' do
+  path = URI.decode(params[:widget_path])
+  body = HTTParty.get("#{path}.#{params[:format]}").body
+  case params[:format]
+    when 'coffee'
+      content_type :js
+      CoffeeScript.compile(body)
+    when 'scss'
+      content_type :css
+      Sass.compile(body)
+    else
+      body
+  end
+end
+
 post '/widgets/:id' do
   request.body.rewind
   body =  JSON.parse(request.body.read)
@@ -116,4 +132,4 @@ Dir[File.join(settings.root, 'lib', '**', '*.rb')].each {|file| require file }
 
 job_path = ENV["JOB_PATH"] || 'jobs'
 files = Dir[File.join(settings.root, job_path, '/*.rb')]
-files.each { |job| require(job) } 
+files.each { |job| require(job) }
