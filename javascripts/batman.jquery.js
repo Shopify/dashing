@@ -49,6 +49,9 @@
       Batman.DOM.willInsertNode(child);
       jQuery(parent).append(child);
       return Batman.DOM.didInsertNode(child);
+    },
+    innerText: function(node) {
+      return jQuery(node).text();
     }
   });
 
@@ -66,8 +69,7 @@
   };
 
   Batman.Request.prototype._prepareOptions = function(data) {
-    var options, _ref,
-      _this = this;
+    var options, _ref, _this = this;
     options = {
       url: this.get('url'),
       type: this.get('method'),
