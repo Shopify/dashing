@@ -3,6 +3,7 @@
 require 'thor'
 require 'net/http'
 require 'json'
+require 'open-uri'
 
 class MockScheduler
   def method_missing(*args)
@@ -57,6 +58,28 @@ module Dashing
       puts "Invalid generator. Either use widget, dashboard, or job"
     end 
     map "g" => :generate
+
+    desc "install GIST_ID", "Install a new widget."
+    def install(gist_id)
+      gist = JSON.parse(open("https://api.github.com/gists/#{gist_id}").read)
+      gist['files'].delete_if { |f| f.end_with?(".md") }.each do |n,c|        
+        if(n.end_with?(".rb"))
+          create_file "#{Dir.pwd}/jobs/#{n}", c['content'] 
+        else
+          if(n.end_with?(".coffee", ".html", ".scss"))
+            widget_name = n.sub(/.[^.]+\z/, '')
+            empty_directory "#{Dir.pwd}/widgets/#{widget_name}"
+            create_file "#{Dir.pwd}/widgets/#{widget_name}/#{n}", c['content'] 
+          end
+        end
+      end
+      print(set_color("Don't forget to edit ", :yellow))
+      print(set_color("Gemfile ", :yellow, :bold))
+      print(set_color("and run ", :yellow))
+      print(set_color("bundle install ", :yellow, :bold))
+      say(set_color("if needed.", :yellow))
+    end
+    map "i" => :install
 
     desc "start", "Starts the server in style!"
     method_option :job_path, :desc => "Specify the directory where jobs are stored"
