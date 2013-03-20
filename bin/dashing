@@ -3,6 +3,7 @@
 require 'thor'
 require 'net/http'
 require 'json'
+require 'open-uri'
 
 class MockScheduler
   def method_missing(*args)
@@ -55,8 +56,33 @@ module Dashing
       send("generate_#{type}".to_sym, name)
     rescue NoMethodError => e
       puts "Invalid generator. Either use widget, dashboard, or job"
-    end 
+    end
     map "g" => :generate
+
+    desc "install GIST_ID", "Installs a new widget from a gist."
+    def install(gist_id)
+      public_url = "https://gist.github.com/#{gist_id}"
+      gist = JSON.parse(open("https://api.github.com/gists/#{gist_id}").read)
+
+      gist['files'].each do |filename, contents|
+        if filename.end_with?(".rb")
+          create_file File.join(Dir.pwd, 'jobs', filename), contents['content']
+        elsif filename.end_with?(".coffee", ".html", ".scss")
+          widget_name = File.basename(filename, '.*')
+          create_file File.join(Dir.pwd, 'widgets', widget_name, filename), contents['content']
+        end
+      end
+
+      print set_color("Don't forget to edit the ", :yellow)
+      print set_color("Gemfile ", :yellow, :bold)
+      print set_color("and run ", :yellow)
+      print set_color("bundle install ", :yellow, :bold)
+      say set_color("if needed. More information for this widget can be found at #{public_url}", :yellow)
+
+    rescue OpenURI::HTTPError => e
+      say set_color("Could not find gist at #{public_url}"), :red
+    end
+    map "i" => :install
 
     desc "start", "Starts the server in style!"
     method_option :job_path, :desc => "Specify the directory where jobs are stored"
@@ -76,7 +102,7 @@ module Dashing
       f = File.join(Dir.pwd, "jobs", "#{name}.rb")
       require f
     end
-  
+
   end
 end
 
