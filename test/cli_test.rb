@@ -17,4 +17,12 @@ class CliTest < Dashing::Test
     end
   end
 
+  def test_hyphenate
+    assert_equal 'power', Dashing::CLI.hyphenate('Power')
+    assert_equal 'power', Dashing::CLI.hyphenate('POWER')
+    assert_equal 'power-rangers', Dashing::CLI.hyphenate('PowerRangers')
+    assert_equal 'power-ranger', Dashing::CLI.hyphenate('Power_ranger')
+    assert_equal 'super-power-rangers', Dashing::CLI.hyphenate('SuperPowerRangers')
+  end
+
 end

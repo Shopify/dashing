@@ -28,6 +28,11 @@ module Dashing
 
     class << self
       attr_accessor :auth_token
+
+      def hyphenate(str)
+        return str.downcase if str =~ /^[A-Z-]+$/
+        str.gsub('_', '-').gsub(/\B[A-Z]/, '-\&').squeeze('-').downcase
+      end
     end
 
     attr_accessor :name
