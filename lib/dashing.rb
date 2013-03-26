@@ -32,6 +32,7 @@ end
 
 get '/events', provides: 'text/event-stream' do
   protected!
+  response.headers['X-Accel-Buffering'] = 'no' # Disable buffering for nginx
   stream :keep_open do |out|
     settings.connections << out
     out << latest_events
@@ -116,4 +117,4 @@ Dir[File.join(settings.root, 'lib', '**', '*.rb')].each {|file| require file }
 
 job_path = ENV["JOB_PATH"] || 'jobs'
 files = Dir[File.join(settings.root, job_path, '/*.rb')]
-files.each { |job| require(job) } 
+files.each { |job| require(job) }
