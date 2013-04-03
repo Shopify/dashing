@@ -32,6 +32,7 @@ end
 
 get '/events', provides: 'text/event-stream' do
   protected!
+  response.headers['X-Accel-Buffering'] = 'no' # Disable buffering if behind an nginx
   stream :keep_open do |out|
     settings.connections << out
     out << latest_events
