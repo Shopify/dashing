@@ -1,0 +1,29 @@
+<% dashboard ||= {} %>
+<% content_for(:title) { dashboard[:title] || "Dynamic dashboard" } %>
+<script type='text/javascript'>
+$(function() {
+    var widgetWidth = <%= dashboard[:widget_width] || 350 %>,
+        widgetHeight = <%= dashboard[:widget_height] || 350 %>;
+
+    Dashing.widget_base_dimensions = [widgetWidth, widgetHeight];
+    Dashing.numColumns = <%= dashboard[:num_columns] || 4 %>;
+});
+</script>
+<div class="gridster">
+  <ul>
+    <% widgets = dashboard[:widgets] || [] %>
+    <% widgets.each do |widget| %>
+      <% attrs = widget[:attributes] || {}
+         attrs['data-id'] = widget[:event] if widget[:event]
+         attrs['data-view'] = widget[:view]  
+         attrs['data-title'] = widget[:title]  
+         (widget[:data] || {}).each {|k,v| attrs["data-#{k}"] = v } %>
+      <li data-row="<%= widget[:row] || 1 %>" data-col="<%= widget[:col] || 1 %>" data-sizex="<%= widget[:sizex] || 1 %>" data-sizey="<%= widget[:sizey] || 1 %>">
+        <div <%= attrs.map{|attr, value| "#{attr}='#{value}'"}.join(" ") %>></div>
+        <% if icon = widget[:background_icon] %>
+          <i class="icon-<%= icon %> icon-background"></i>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</div>
