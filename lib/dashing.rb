@@ -58,8 +58,8 @@ end
 get '/' do
   protected!
   begin
-  redirect "/" + (settings.default_dashboard || first_dashboard).to_s
-  rescue NoMethodError => e
+    redirect "/" + (settings.default_dashboard || first_dashboard).to_s
+  rescue NoMethodError
     raise Exception.new("There are no dashboards in your dashboard directory.")
   end
 end
