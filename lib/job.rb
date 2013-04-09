@@ -1,5 +1,7 @@
 module Dashing
   class Job
+    include Sinatra::Delegator
+
     def initialize(event, config)
       @event = event
       @config = config
