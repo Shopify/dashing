@@ -157,7 +157,7 @@ end
 
 def first_dashboard
   files = Dir[File.join(settings.views, '*')].collect { |f| File.basename(f, '.*') }
-  files -= ['layout']
+  files -= ['layout', 'dynamic']
   files.sort.first
 end
 
