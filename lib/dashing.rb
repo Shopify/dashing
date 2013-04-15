@@ -50,7 +50,9 @@ end
 
 get '/:dashboard' do
   protected!
-  if File.exist? File.join(settings.views, "#{params[:dashboard]}.erb")
+  if File.exist? File.join(settings.views, "#{params[:dashboard]}.haml")
+    haml params[:dashboard].to_sym
+  elsif File.exist? File.join(settings.views, "#{params[:dashboard]}.erb")
     erb params[:dashboard].to_sym
   else
     halt 404
