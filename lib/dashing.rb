@@ -63,7 +63,8 @@ end
 
 
 
-get '/views/:widget?.html' do
+get "#{Sinatra::Application.relative_root}/views/:widget?.html" do
+#get '/views/:widget?.html' do
   protected!
   widget = params[:widget]
   send_file File.join(settings.root, 'widgets', widget, "#{widget}.html")
