@@ -32,7 +32,7 @@ helpers do
   end
 end
 
-get '/events', provides: 'text/event-stream' do
+get "#{Sinatra::Application.relative_root}/events", provides: 'text/event-stream' do
   protected!
   response.headers['X-Accel-Buffering'] = 'no' # Disable buffering for nginx
   stream :keep_open do |out|
