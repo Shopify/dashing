@@ -10,8 +10,10 @@ SCHEDULER = Rufus::Scheduler.start_new
 
 set :root, Dir.pwd
 
+set :relative_root, "/nitrodash"
+
 set :sprockets,     Sprockets::Environment.new(settings.root)
-set :assets_prefix, '/assets'
+set :assets_prefix, "#{Sinatra::Application.relative_root}/assets"
 set :digest_assets, false
 ['assets/javascripts', 'assets/stylesheets', 'assets/fonts', 'assets/images', 'widgets', File.expand_path('../../javascripts', __FILE__)]. each do |path|
   settings.sprockets.append_path path
@@ -58,6 +60,8 @@ get '/:dashboard' do
     halt 404
   end
 end
+
+
 
 get '/views/:widget?.html' do
   protected!
