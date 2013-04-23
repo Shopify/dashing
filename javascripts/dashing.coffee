@@ -3,6 +3,7 @@
 #= require batman
 #= require batman.jquery
 
+Batman.config.viewPrefix = "nitrodash/views"
 
 Batman.Filters.prettyNumber = (num) ->
   num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") unless isNaN(num)
