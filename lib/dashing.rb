@@ -42,7 +42,15 @@ end
 
 get '/' do
   begin
-  redirect "/" + (settings.default_dashboard || first_dashboard).to_s
+    if defined? settings.home_dashboard
+      if File.exist? File.join(settings.views, "#{settings.home_dashboard}.erb")
+        erb settings.home_dashboard.to_sym
+      else
+        halt 404
+      end
+    else
+      redirect "/" + (settings.default_dashboard || first_dashboard).to_s
+    end
   rescue NoMethodError => e
     raise Exception.new("There are no dashboards in your dashboard directory.")
   end
