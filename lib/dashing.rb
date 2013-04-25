@@ -43,11 +43,7 @@ end
 get '/' do
   begin
     if defined? settings.home_dashboard
-      if File.exist? File.join(settings.views, "#{settings.home_dashboard}.erb")
-        erb settings.home_dashboard.to_sym
-      else
-        halt 404
-      end
+      load_dashboard(settings.home_dashboard)
     else
       redirect "/" + (settings.default_dashboard || first_dashboard).to_s
     end
@@ -57,12 +53,7 @@ get '/' do
 end
 
 get '/:dashboard' do
-  protected!
-  if File.exist? File.join(settings.views, "#{params[:dashboard]}.erb")
-    erb params[:dashboard].to_sym
-  else
-    halt 404
-  end
+  load_dashboard(params[:dashboard])
 end
 
 get '/views/:widget?.html' do
@@ -118,6 +109,15 @@ def first_dashboard
   files = Dir[File.join(settings.views, '*.erb')].collect { |f| f.match(/(\w*).erb/)[1] }
   files -= ['layout']
   files.first
+end
+
+def load_dashboard(dashboard)
+  protected!
+  if File.exist? File.join(settings.views, "#{dashboard}.erb")
+    erb dashboard.to_sym
+  else
+    halt 404
+  end
 end
 
 Dir[File.join(settings.root, 'lib', '**', '*.rb')].each {|file| require file }
