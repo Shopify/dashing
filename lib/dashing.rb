@@ -42,8 +42,8 @@ end
 
 get '/' do
   begin
-    if defined? settings.home_dashboard
-      load_dashboard(settings.home_dashboard)
+    if defined? settings.root_dashboard
+      load_dashboard(settings.root_dashboard)
     else
       redirect "/" + (settings.default_dashboard || first_dashboard).to_s
     end
