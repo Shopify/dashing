@@ -28,6 +28,12 @@ module Dashing
 
     class << self
       attr_accessor :auth_token
+
+      def dash_separated(str)
+        return str.downcase if str =~ /^[A-Z-]+$/
+        str.gsub(/\B[A-Z]/, '-\&').squeeze('-') =~ /-*(.*)/
+        return $+.downcase
+      end
     end
 
     attr_accessor :name
@@ -35,7 +41,7 @@ module Dashing
     no_tasks do
       ['widget', 'dashboard', 'job'].each do |type|
         define_method "generate_#{type}" do |name|
-          @name = Thor::Util.snake_case(name)
+          @name = CLI.dash_separated(name)
           directory type.to_sym, File.join("#{type}s")
         end
       end
@@ -47,7 +53,7 @@ module Dashing
 
     desc "new PROJECT_NAME", "Sets up ALL THE THINGS needed for your dashboard project."
     def new(name)
-      @name = Thor::Util.snake_case(name)
+      @name = CLI.dash_separated(name)
       directory :project, @name
     end
 
