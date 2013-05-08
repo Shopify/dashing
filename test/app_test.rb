@@ -6,13 +6,7 @@ class AppTest < Dashing::Test
     @connection = []
     Sinatra::Application.settings.connections = [@connection]
     Sinatra::Application.settings.auth_token = nil
-  end
-
-  def test_redirect_to_default_dashboard
-    Sinatra::Application.settings.default_dashboard = 'test1'
-    get '/'
-    assert_equal 302, last_response.status
-    assert_equal 'http://example.org/test1', last_response.location
+    Sinatra::Application.settings.default_dashboard = nil
   end
 
   def test_post_widgets_without_auth_token
@@ -46,12 +40,36 @@ class AppTest < Dashing::Test
     assert_equal 200, last_response.status
     assert_equal 8, parse_data(@connection[0])['value']
   end
+  
+  def test_redirect_to_default_dashboard
+    with_generated_project do
+      Sinatra::Application.settings.default_dashboard = 'test1'
+      get '/'
+      assert_equal 302, last_response.status
+      assert_equal 'http://example.org/test1', last_response.location
+    end
+  end
+
+  def test_redirect_to_first_dashboard
+    with_generated_project do
+      get '/'
+      assert_equal 302, last_response.status
+      assert_equal 'http://example.org/sample', last_response.location
+    end
+  end
 
   def test_get_dashboard
     with_generated_project do
       get '/sampletv'
       assert_equal 200, last_response.status
       assert_include last_response.body, 'class="gridster"'
+    end
+  end
+  
+  def test_get_nonexistent_dashboard
+    with_generated_project do
+      get '/nodashboard'
+      assert_equal 404, last_response.status
     end
   end
 
