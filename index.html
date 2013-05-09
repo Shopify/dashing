@@ -187,7 +187,7 @@
         <p>You send data using the following method:</p>
         <code>send_event(widget_id, json_formatted_data)</code>
         <br/>
-        <p>Jobs are where you put stuff such as fetching metrics from a database, or calling a third party API like Twitter. Since the data fetch is happening in only one place, it means that all instances of widgets are in sync. <a href="http://www.html5rocks.com/en/tutorials/eventsource/basics/">Server Sent Events</a> are used in order to stream data to the dashboards. </p>
+        <p>Jobs are where you put stuff such as fetching metrics from a database, or calling a third party API like Twitter. Since the data fetch is happening in only one place, it means that all instances of widgets are in sync. <a href="http://www.html5rocks.com/en/tutorials/eventsource/basics/" target="_blank">Server Sent Events</a> are used in order to stream data to the dashboards. </p>
         <h4>API</h4>
 
         <p>You can also push data directly to your dashboard! Post the data you want in json to <code>/widgets/widget_id</code>.
@@ -217,6 +217,7 @@
         <h3 class="section-title">Browser Compatibility</h3>
         <div class="section-content">
           <p>Tested in Chrome, Safari 6+, and Firefox 15+. </p>
+          <p>Does <strong>not</strong> work in Internet Explorer because it relies on <a href="http://www.html5rocks.com/en/tutorials/eventsource/basics/" target="_blank">Server Sent Events.</a></p>
         </div>
       </section>
 
