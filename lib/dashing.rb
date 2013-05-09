@@ -42,19 +42,18 @@ end
 
 get '/' do
   begin
-  redirect "/" + (settings.default_dashboard || first_dashboard).to_s
+    if defined? settings.root_dashboard
+      load_dashboard(settings.root_dashboard)
+    else
+      redirect "/" + (settings.default_dashboard || first_dashboard).to_s
+    end
   rescue NoMethodError => e
     raise Exception.new("There are no dashboards in your dashboard directory.")
   end
 end
 
 get '/:dashboard' do
-  protected!
-  if File.exist? File.join(settings.views, "#{params[:dashboard]}.erb")
-    erb params[:dashboard].to_sym
-  else
-    halt 404
-  end
+  load_dashboard(params[:dashboard])
 end
 
 get '/views/:widget?.html' do
@@ -110,6 +109,15 @@ def first_dashboard
   files = Dir[File.join(settings.views, '*.erb')].collect { |f| f.match(/(\w*).erb/)[1] }
   files -= ['layout']
   files.first
+end
+
+def load_dashboard(dashboard)
+  protected!
+  if File.exist? File.join(settings.views, "#{dashboard}.erb")
+    erb dashboard.to_sym
+  else
+    halt 404
+  end
 end
 
 Dir[File.join(settings.root, 'lib', '**', '*.rb')].each {|file| require file }
