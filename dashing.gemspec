@@ -2,8 +2,8 @@
 
 Gem::Specification.new do |s|
   s.name        = 'dashing'
-  s.version     = '1.0.4'
-  s.date        = '2013-02-13'
+  s.version     = '1.0.5'
+  s.date        = '2013-05-09'
   s.executables << 'dashing'
 
 
@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.files = Dir['README.md', 'javascripts/**/*', 'templates/**/*','templates/**/.[a-z]*', 'lib/**/*']
 
   s.add_dependency('sass')
-  s.add_dependency('coffee-script')
+  s.add_dependency('coffee-script', '>=1.6.2')
   s.add_dependency('sinatra')
   s.add_dependency('sinatra-contrib')
   s.add_dependency('thin')
