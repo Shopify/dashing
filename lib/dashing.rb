@@ -50,8 +50,12 @@ end
 
 get '/:dashboard' do
   protected!
-  if File.exist? File.join(settings.views, "#{params[:dashboard]}.erb")
-    erb params[:dashboard].to_sym
+  view_engine = Tilt.mappings.keys.find do |ext|
+    File.exist? File.join(settings.views, "#{params[:dashboard]}.#{ext}")
+  end
+
+  if view_engine
+    render view_engine.to_sym, params[:dashboard].to_sym
   else
     halt 404
   end
@@ -107,7 +111,7 @@ def latest_events
 end
 
 def first_dashboard
-  files = Dir[File.join(settings.views, '*.erb')].collect { |f| f.match(/(\w*).erb/)[1] }
+  files = Dir[File.join(settings.views, '*')].collect { |f| File.basename(f, '.*') }
   files -= ['layout']
   files.first
 end

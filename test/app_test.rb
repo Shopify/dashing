@@ -58,6 +58,15 @@ class AppTest < Dashing::Test
     end
   end
 
+  def test_redirect_to_first_dashboard_without_erb
+    with_generated_project do |dir|
+      FileUtils.touch(File.join(dir, "dashboards/htmltest.html"))
+      get '/'
+      assert_equal 302, last_response.status
+      assert_equal 'http://example.org/htmltest', last_response.location
+    end
+  end
+
   def test_get_dashboard
     with_generated_project do
       get '/sampletv'
@@ -65,7 +74,26 @@ class AppTest < Dashing::Test
       assert_include last_response.body, 'class="gridster"'
     end
   end
-  
+
+  begin
+    require 'haml'
+    def test_get_haml
+      with_generated_project do |dir|
+        File.write(File.join(dir, "dashboards/hamltest.haml"), <<-HAML)
+.gridster
+  %ul
+    %li{data: {col: 1, row: 1, sizex: 1, sizey: 1}}
+      %div{data: {view: "Clock"}}
+      %i.icon-time.icon-background
+HAML
+        get '/hamltest'
+        assert_equal 200, last_response.status
+        assert_include last_response.body, "class='gridster'"
+      end
+    end
+  rescue LoadError
+  end
+
   def test_get_nonexistent_dashboard
     with_generated_project do
       get '/nodashboard'
@@ -88,7 +116,7 @@ class AppTest < Dashing::Test
 
       Sinatra::Application.settings.views = File.join(dir, 'new_project/dashboards')
       Sinatra::Application.settings.root = File.join(dir, 'new_project')
-      yield
+      yield Sinatra::Application.settings.root
     end
   end
 
