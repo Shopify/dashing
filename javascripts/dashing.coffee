@@ -100,13 +100,27 @@ source.addEventListener 'error', (e)->
 
 source.addEventListener 'message', (e) =>
   data = JSON.parse(e.data)
-  if lastEvents[data.id]?.updatedAt != data.updatedAt
-    if Dashing.debugMode
-      console.log("Received data for #{data.id}", data)
-    lastEvents[data.id] = data
-    if widgets[data.id]?.length > 0
-      for widget in widgets[data.id]
-        widget.receiveData(data)
+
+  if data.restart
+    # Wait 20 seconds for server to restart.
+    # Every 5 seconds, check if the server is back up.
+    console.log "Server is restarting..."
+    setTimeout ->
+      setInterval ->
+        $.get('/up', (data) ->
+          console.log("Reloading page...")
+          location.reload(true)
+        ).fail(-> console.log("Waiting for server to start..."))
+      , 5000
+    , 20000
+  else
+    if lastEvents[data.id]?.updatedAt != data.updatedAt
+      if Dashing.debugMode
+        console.log("Received data for #{data.id}", data)
+      lastEvents[data.id] = data
+      if widgets[data.id]?.length > 0
+        for widget in widgets[data.id]
+          widget.receiveData(data)
 
 
 $(document).ready ->

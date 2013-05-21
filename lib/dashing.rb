@@ -5,6 +5,7 @@ require 'rufus/scheduler'
 require 'coffee-script'
 require 'sass'
 require 'json'
+require 'yaml'
 
 SCHEDULER = Rufus::Scheduler.start_new
 
@@ -17,7 +18,21 @@ set :digest_assets, false
   settings.sprockets.append_path path
 end
 
-set server: 'thin', connections: [], history: {}
+set server: 'thin', connections: [], history_file: 'tmp/history.yml'
+
+# Persist history in tmp file at exit
+at_exit do
+  File.open(settings.history_file, 'w') do |f|
+    f.puts settings.history.to_yaml
+  end
+end
+
+if File.exists?(settings.history_file)
+  set history: YAML.load_file(settings.history_file)
+else
+  set history: {}
+end
+
 set :public_folder, File.join(settings.root, 'public')
 set :views, File.join(settings.root, 'dashboards')
 set :default_dashboard, nil
@@ -46,6 +61,15 @@ get '/' do
   rescue NoMethodError => e
     raise Exception.new("There are no dashboards in your dashboard directory.")
   end
+end
+
+get '/up' do
+  status 200
+end
+
+get '/restart' do
+  send_restart_event
+  status 200
 end
 
 get '/:dashboard' do
@@ -93,6 +117,12 @@ def send_event(id, body)
   body[:updatedAt] ||= Time.now.to_i
   event = format_event(body.to_json)
   Sinatra::Application.settings.history[id] = event
+  Sinatra::Application.settings.connections.each { |out| out << event }
+end
+
+def send_restart_event
+  body = { restart: true }
+  event = format_event(body.to_json)
   Sinatra::Application.settings.connections.each { |out| out << event }
 end
 
