@@ -63,6 +63,15 @@ get '/' do
   end
 end
 
+get '/up' do
+  status 200
+end
+
+get '/restart' do
+  send_restart_event
+  status 200
+end
+
 get '/:dashboard' do
   protected!
   if File.exist? File.join(settings.views, "#{params[:dashboard]}.erb")
@@ -108,6 +117,12 @@ def send_event(id, body)
   body[:updatedAt] ||= Time.now.to_i
   event = format_event(body.to_json)
   Sinatra::Application.settings.history[id] = event
+  Sinatra::Application.settings.connections.each { |out| out << event }
+end
+
+def send_restart_event
+  body = { restart: true }
+  event = format_event(body.to_json)
   Sinatra::Application.settings.connections.each { |out| out << event }
 end
 
