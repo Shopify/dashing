@@ -95,10 +95,6 @@ Dashing.debugMode = false
 Dashing.errorCount = 0
 
 source = new EventSource('/nitrodash/events')
-source.onerror = (e) ->
-  Dashing.errorCount += 1
-  if Dashing.errorCount >= 2
-    $('#disconnected').show()
 
 source.addEventListener 'open', (e) ->
   Dashing.errorCount = 0
@@ -109,6 +105,9 @@ source.addEventListener 'error', (e)->
   console.log("Connection error")
   if (e.readyState == EventSource.CLOSED)
     console.log("Connection closed")
+    Dashing.errorCount += 1
+    if Dashing.errorCount >= 2
+      $('#disconnected').show()
 
 source.addEventListener 'message', (e) =>
   data = JSON.parse(e.data)
