@@ -25,6 +25,8 @@ Batman.Filters.shortenedNumber = (num) ->
   else
     num
 
+
+
 class window.Dashing extends Batman.App
   @root ->
 Dashing.params = Batman.URI.paramsFromQuery(window.location.search.slice(1));
@@ -90,8 +92,17 @@ Dashing.widgets = widgets = {}
 Dashing.lastEvents = lastEvents = {}
 Dashing.debugMode = false
 
+Dashing.errorCount = 0
+
 source = new EventSource('/nitrodash/events')
+source.onerror = (e) ->
+  Dashing.errorCount += 1
+  if Dashing.errorCount > 3
+    $('#disconnected').show()
+
 source.addEventListener 'open', (e) ->
+  Dashing.errorCount = 0
+  $('#disconnected').hide()
   console.log("Connection opened")
 
 source.addEventListener 'error', (e)->
