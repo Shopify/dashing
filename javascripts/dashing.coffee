@@ -97,7 +97,7 @@ Dashing.errorCount = 0
 source = new EventSource('/nitrodash/events')
 source.onerror = (e) ->
   Dashing.errorCount += 1
-  if Dashing.errorCount > 3
+  if Dashing.errorCount >= 2
     $('#disconnected').show()
 
 source.addEventListener 'open', (e) ->
