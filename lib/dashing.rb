@@ -5,6 +5,7 @@ require 'rufus/scheduler'
 require 'coffee-script'
 require 'sass'
 require 'json'
+require 'yaml'
 
 SCHEDULER = Rufus::Scheduler.start_new
 
@@ -17,7 +18,21 @@ set :digest_assets, false
   settings.sprockets.append_path path
 end
 
-set server: 'thin', connections: [], history: {}
+set server: 'thin', connections: [], history_file: 'tmp/history.yml'
+
+# Persist history in tmp file at exit
+at_exit do
+  File.open(settings.history_file, 'w') do |f|
+    f.puts settings.history.to_yaml
+  end
+end
+
+if File.exists?(settings.history_file)
+  set history: YAML.load_file(settings.history_file)
+else
+  set history: {}
+end
+
 set :public_folder, File.join(settings.root, 'public')
 set :views, File.join(settings.root, 'dashboards')
 set :default_dashboard, nil
