@@ -18,7 +18,7 @@ set :digest_assets, false
   settings.sprockets.append_path path
 end
 
-set server: 'thin', connections: [], history_file: 'tmp/history.yml'
+set server: 'thin', connections: [], history_file: 'history.yml'
 
 # Persist history in tmp file at exit
 at_exit do
