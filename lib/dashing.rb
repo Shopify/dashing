@@ -1,4 +1,6 @@
 require 'sinatra'
+require 'sinatra/base'
+require 'sinatra/namespace'
 require 'sprockets'
 require 'sinatra/content_for'
 require 'rufus/scheduler'
@@ -10,8 +12,9 @@ SCHEDULER = Rufus::Scheduler.start_new
 
 set :root, Dir.pwd
 
-set :sprockets,     Sprockets::Environment.new(settings.root)
-set :assets_prefix, '/assets'
+set(:sprockets,     Sprockets::Environment.new(settings.root))
+
+set :assets_prefix, "#{settings.namespace_path}/assets"
 set :digest_assets, false
 ['assets/javascripts', 'assets/stylesheets', 'assets/fonts', 'assets/images', 'widgets', File.expand_path('../../javascripts', __FILE__)]. each do |path|
   settings.sprockets.append_path path
@@ -30,50 +33,57 @@ helpers do
   end
 end
 
-get '/events', provides: 'text/event-stream' do
-  protected!
-  response.headers['X-Accel-Buffering'] = 'no' # Disable buffering for nginx
-  stream :keep_open do |out|
-    settings.connections << out
-    out << latest_events
-    out.callback { settings.connections.delete(out) }
-  end
-end
 
-get '/' do
-  begin
-  redirect "/" + (settings.default_dashboard || first_dashboard).to_s
-  rescue NoMethodError => e
-    raise Exception.new("There are no dashboards in your dashboard directory.")
+namespace settings.namespace_path do
+  get '/events', provides: 'text/event-stream' do
+    protected!
+    response.headers['X-Accel-Buffering'] = 'no' # Disable buffering for nginx
+    stream :keep_open do |out|
+      settings.connections << out
+      out << latest_events
+      out.callback { settings.connections.delete(out) }
+    end
   end
-end
 
-get '/:dashboard' do
-  protected!
-  if File.exist? File.join(settings.views, "#{params[:dashboard]}.erb")
-    erb params[:dashboard].to_sym
-  else
-    halt 404
+  get '/' do
+    begin
+    redirect "/" + (settings.default_dashboard || first_dashboard).to_s
+    rescue NoMethodError => e
+      raise Exception.new("There are no dashboards in your dashboard directory.")
+    end
   end
-end
 
-get '/views/:widget?.html' do
-  protected!
-  widget = params[:widget]
-  send_file File.join(settings.root, 'widgets', widget, "#{widget}.html")
-end
-
-post '/widgets/:id' do
-  request.body.rewind
-  body =  JSON.parse(request.body.read)
-  auth_token = body.delete("auth_token")
-  if !settings.auth_token || settings.auth_token == auth_token
-    send_event(params['id'], body)
-    204 # response without entity body
-  else
-    status 401
-    "Invalid API key\n"
+  get '/:dashboard' do
+    protected!
+    if File.exist? File.join(settings.views, "#{params[:dashboard]}.haml")
+      haml params[:dashboard].to_sym
+    elsif File.exist? File.join(settings.views, "#{params[:dashboard]}.erb")
+      erb params[:dashboard].to_sym
+    else
+      halt 404
+    end
   end
+
+  get '/views/:widget?.html' do
+    protected!
+    widget = params[:widget]
+    ap File.join(settings.root, 'widgets', widget, "#{widget}.html")
+    send_file File.join(settings.root, 'widgets', widget, "#{widget}.html")
+  end
+
+  post '/widgets/:id' do
+    request.body.rewind
+    body =  JSON.parse(request.body.read)
+    auth_token = body.delete("auth_token")
+    if !settings.auth_token || settings.auth_token == auth_token
+      send_event(params['id'], body)
+      204 # response without entity body
+    else
+      status 401
+      "Invalid API key\n"
+    end
+  end
+
 end
 
 not_found do

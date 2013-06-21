@@ -3,6 +3,7 @@
 #= require batman
 #= require batman.jquery
 
+Batman.config.viewPrefix = "nitrodash/views"
 
 Batman.Filters.prettyNumber = (num) ->
   num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") unless isNaN(num)
@@ -23,6 +24,8 @@ Batman.Filters.shortenedNumber = (num) ->
     (num / 1000).toFixed(1) + 'K'
   else
     num
+
+
 
 class window.Dashing extends Batman.App
   @root ->
@@ -89,14 +92,22 @@ Dashing.widgets = widgets = {}
 Dashing.lastEvents = lastEvents = {}
 Dashing.debugMode = false
 
-source = new EventSource('/events')
+Dashing.errorCount = 0
+
+source = new EventSource('/nitrodash/events')
+
 source.addEventListener 'open', (e) ->
+  Dashing.errorCount = 0
+  $('#disconnected').hide()
   console.log("Connection opened")
 
 source.addEventListener 'error', (e)->
   console.log("Connection error")
   if (e.readyState == EventSource.CLOSED)
     console.log("Connection closed")
+    Dashing.errorCount += 1
+    if Dashing.errorCount >= 2
+      $('#disconnected').show()
 
 source.addEventListener 'message', (e) =>
   data = JSON.parse(e.data)
