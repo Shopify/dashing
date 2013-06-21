@@ -50,17 +50,20 @@ end
 
 get '/:dashboard' do
   protected!
-  if File.exist? File.join(settings.views, "#{params[:dashboard]}.erb")
-    erb params[:dashboard].to_sym
-  else
-    halt 404
+  tilt_html_engines.each do |suffix, _|
+    file = File.join(settings.views, "#{params[:dashboard]}.#{suffix}")
+    return render(suffix.to_sym, params[:dashboard].to_sym) if File.exist? file
   end
+
+  halt 404
 end
 
 get '/views/:widget?.html' do
   protected!
-  widget = params[:widget]
-  send_file File.join(settings.root, 'widgets', widget, "#{widget}.html")
+  tilt_html_engines.each do |suffix, engines|
+    file = File.join(settings.root, "widgets", params[:widget], "#{params[:widget]}.#{suffix}")
+    return engines.first.new(file).render if File.exist? file
+  end
 end
 
 post '/widgets/:id' do
@@ -107,9 +110,16 @@ def latest_events
 end
 
 def first_dashboard
-  files = Dir[File.join(settings.views, '*.erb')].collect { |f| f.match(/(\w*).erb/)[1] }
+  files = Dir[File.join(settings.views, '*')].collect { |f| File.basename(f, '.*') }
   files -= ['layout']
   files.first
+end
+
+def tilt_html_engines
+  Tilt.mappings.select do |_, engines|
+    default_mime_type = engines.first.default_mime_type
+    default_mime_type.nil? || default_mime_type == 'text/html'
+  end
 end
 
 Dir[File.join(settings.root, 'lib', '**', '*.rb')].each {|file| require file }
