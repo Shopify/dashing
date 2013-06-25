@@ -40,7 +40,7 @@ class AppTest < Dashing::Test
     assert_equal 200, last_response.status
     assert_equal 8, parse_data(@connection[0])['value']
   end
-  
+
   def test_redirect_to_default_dashboard
     with_generated_project do
       Sinatra::Application.settings.default_dashboard = 'test1'
@@ -73,6 +73,13 @@ class AppTest < Dashing::Test
       assert_equal 200, last_response.status
       assert_include last_response.body, 'class="gridster"'
       assert_include last_response.body, "DOCTYPE"
+    end
+  end
+
+  def test_page_title_set_correctly
+    with_generated_project do
+      get '/sampletv'
+      assert_include last_response.body, '<title>1080p dashboard</title>'
     end
   end
 
