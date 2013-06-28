@@ -141,5 +141,5 @@ Dir[File.join(settings.root, 'lib', '**', '*.rb')].each {|file| require file }
 {}.to_json # Forces your json codec to initialize (in the event that it is lazily loaded). Does this before job threads start.
 
 job_path = ENV["JOB_PATH"] || 'jobs'
-files = Dir[File.join(settings.root, job_path, '/*.rb')]
+files = Dir[File.join(settings.root, job_path, '**', '/*.rb')]
 files.each { |job| require(job) }
