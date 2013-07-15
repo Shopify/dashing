@@ -1,5 +1,6 @@
 require 'test_helper'
 require File.expand_path('../../lib/dashing', __FILE__)
+Sinatra::Application.settings.history_file = File.join(Dir.tmpdir, 'history.yml')
 
 class AppTest < Dashing::Test
   def setup
