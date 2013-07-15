@@ -106,10 +106,6 @@ source.addEventListener 'error', (e)->
 source.addEventListener 'message', (e) ->
   data = JSON.parse(e.data)
   if lastEvents[data.id]?.updatedAt != data.updatedAt
-    # /messages are internal messages, and cannot correspond to widgets.
-    # We will handle them as events on the Dashing application.
-    return Dashing.fire(data.id.slice(1), data) if data.id[0] is '/'
-
     if Dashing.debugMode
       console.log("Received data for #{data.id}", data)
     lastEvents[data.id] = data
@@ -117,6 +113,11 @@ source.addEventListener 'message', (e) ->
       for widget in widgets[data.id]
         widget.receiveData(data)
 
+source.addEventListener 'dashboards', (e) ->
+  data = JSON.parse(e.data)
+  if Dashing.debugMode
+    console.log("Received data for dashboards", data)
+  Dashing.fire data.event, data
 
 $(document).ready ->
   Dashing.run()
