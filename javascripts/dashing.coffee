@@ -26,10 +26,7 @@ Batman.Filters.shortenedNumber = (num) ->
 
 class window.Dashing extends Batman.App
   @on 'reload', (data) ->
-    if data.dashboard?
-      location.reload() if window.location.pathname is "/#{data.dashboard}"
-    else
-      location.reload()
+    window.location.reload(true)
 
   @root ->
 Dashing.params = Batman.URI.paramsFromQuery(window.location.search.slice(1));
@@ -89,6 +86,7 @@ Dashing.AnimatedValue =
             @[k] = num
             @set k, to
           , 10
+      @[k] = num
 
 Dashing.widgets = widgets = {}
 Dashing.lastEvents = lastEvents = {}
@@ -117,7 +115,8 @@ source.addEventListener 'dashboards', (e) ->
   data = JSON.parse(e.data)
   if Dashing.debugMode
     console.log("Received data for dashboards", data)
-  Dashing.fire data.event, data
+  if data.dashboard is '*' or window.location.pathname is "/#{data.dashboard}"
+    Dashing.fire data.event, data
 
 $(document).ready ->
   Dashing.run()
