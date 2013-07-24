@@ -92,6 +92,12 @@ module Dashing
     end
     map "s" => :start
 
+    desc "stop", "Stops the thin server"
+    def stop
+      command = "bundle exec thin stop"
+      system(command)
+    end
+    
     desc "job JOB_NAME AUTH_TOKEN(optional)", "Runs the specified job. Make sure to supply your auth token if you have one set."
     def job(name, auth_token = "")
       Dir[File.join(Dir.pwd, 'lib/**/*.rb')].each {|file| require file }
