@@ -81,9 +81,23 @@ get '/views/:widget?.html' do
   end
 end
 
+post '/dashboards/:id' do
+  request.body.rewind
+  body = JSON.parse(request.body.read)
+  body['dashboard'] ||= params['id']
+  auth_token = body.delete("auth_token")
+  if !settings.auth_token || settings.auth_token == auth_token
+    send_event(params['id'], body, 'dashboards')
+    204 # response without entity body
+  else
+    status 401
+    "Invalid API key\n"
+  end
+end
+
 post '/widgets/:id' do
   request.body.rewind
-  body =  JSON.parse(request.body.read)
+  body = JSON.parse(request.body.read)
   auth_token = body.delete("auth_token")
   if !settings.auth_token || settings.auth_token == auth_token
     send_event(params['id'], body)
@@ -106,16 +120,18 @@ def production?
   ENV['RACK_ENV'] == 'production'
 end
 
-def send_event(id, body)
+def send_event(id, body, target=nil)
   body[:id] = id
   body[:updatedAt] ||= Time.now.to_i
-  event = format_event(body.to_json)
-  Sinatra::Application.settings.history[id] = event
+  event = format_event(body.to_json, target)
+  Sinatra::Application.settings.history[id] = event unless target == 'dashboards'
   Sinatra::Application.settings.connections.each { |out| out << event }
 end
 
-def format_event(body)
-  "data: #{body}\n\n"
+def format_event(body, name=nil)
+  str = ""
+  str << "event: #{name}\n" if name
+  str << "data: #{body}\n\n"
 end
 
 def latest_events

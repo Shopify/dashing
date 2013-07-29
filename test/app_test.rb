@@ -42,6 +42,16 @@ class AppTest < Dashing::Test
     assert_equal 8, parse_data(@connection[0])['value']
   end
 
+  def test_dashboard_events
+    post '/dashboards/my_super_sweet_dashboard', JSON.generate({event: 'reload'})
+    assert_equal 204, last_response.status
+
+    get '/events'
+    assert_equal 200, last_response.status
+    assert_equal 'dashboards', parse_event(@connection[0])
+    assert_equal 'reload', parse_data(@connection[0])['event']
+  end
+
   def test_redirect_to_default_dashboard
     with_generated_project do
       Sinatra::Application.settings.default_dashboard = 'test1'
@@ -141,5 +151,9 @@ class AppTest < Dashing::Test
 
   def parse_data(string)
     JSON.parse string[/data: (.+)/, 1]
+  end
+
+  def parse_event(string)
+    string[/event: (.+)/, 1]
   end
 end

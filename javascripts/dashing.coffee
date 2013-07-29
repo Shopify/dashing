@@ -25,6 +25,9 @@ Batman.Filters.shortenedNumber = (num) ->
     num
 
 class window.Dashing extends Batman.App
+  @on 'reload', (data) ->
+    window.location.reload(true)
+
   @root ->
 Dashing.params = Batman.URI.paramsFromQuery(window.location.search.slice(1));
 
@@ -98,7 +101,7 @@ source.addEventListener 'error', (e)->
   if (e.readyState == EventSource.CLOSED)
     console.log("Connection closed")
 
-source.addEventListener 'message', (e) =>
+source.addEventListener 'message', (e) ->
   data = JSON.parse(e.data)
   if lastEvents[data.id]?.updatedAt != data.updatedAt
     if Dashing.debugMode
@@ -108,6 +111,12 @@ source.addEventListener 'message', (e) =>
       for widget in widgets[data.id]
         widget.receiveData(data)
 
+source.addEventListener 'dashboards', (e) ->
+  data = JSON.parse(e.data)
+  if Dashing.debugMode
+    console.log("Received data for dashboards", data)
+  if data.dashboard is '*' or window.location.pathname is "/#{data.dashboard}"
+    Dashing.fire data.event, data
 
 $(document).ready ->
   Dashing.run()
