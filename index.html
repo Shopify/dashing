@@ -190,17 +190,28 @@
         <p>Jobs are where you put stuff such as fetching metrics from a database, or calling a third party API like Twitter. Since the data fetch is happening in only one place, it means that all instances of widgets are in sync. <a href="http://www.html5rocks.com/en/tutorials/eventsource/basics/" target="_blank">Server Sent Events</a> are used in order to stream data to the dashboards. </p>
         <h4>API</h4>
 
-        <p>You can also push data directly to your dashboard! Post the data you want in json to <code>/widgets/widget_id</code>.
+        <p>Your widgets can be updated directly over HTTP. Post the data you want in json to <code>/widgets/widget_id</code>.
           For security, you will also have to include your auth_token (which can be found in <code>config.ru</code>).</p>
 
-          <h6>Example</h6>
+        <h6>Example</h6>
 
-          <script src="https://gist.github.com/3978832.js?file=push.sh"></script>
+        <script src="https://gist.github.com/3978832.js?file=push.sh"></script>
 
-          <p>or</p>
+        <p>or</p>
 
-          <script src="https://gist.github.com/3981096.js?file=push.rb"></script>
+        <script src="https://gist.github.com/3981096.js?file=push.rb"></script>
 
+        <p>You can also perform dashboard-level actions by posting to <code>/dashboards/dashboard_id</code>. Currently there is a single event available, <code>reload</code>, that will refresh the target dashboard in the browser.</p>
+
+        <h6>Example</h6>
+
+        <script src="https://gist.github.com/davefp/6112780.js?file=curl.sh"></script>
+
+        <p>If you want an event to target every dashboard, use a wildcard (<code>*</code>).</p>
+
+        <h6>Example</h6>
+
+        <script src="https://gist.github.com/davefp/6112780.js?file=curl2.sh"></script>
 
         </div>
       </section>
