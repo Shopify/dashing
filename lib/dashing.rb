@@ -56,6 +56,7 @@ get '/events', provides: 'text/event-stream' do
 end
 
 get '/' do
+  protected!
   begin
   redirect "/" + (settings.default_dashboard || first_dashboard).to_s
   rescue NoMethodError => e
