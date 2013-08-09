@@ -144,7 +144,7 @@ end
 def first_dashboard
   files = Dir[File.join(settings.views, '*')].collect { |f| File.basename(f, '.*') }
   files -= ['layout']
-  files.first
+  files.sort.first
 end
 
 def tilt_html_engines
