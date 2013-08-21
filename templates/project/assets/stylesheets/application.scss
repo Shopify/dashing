@@ -35,22 +35,22 @@ $text-danger-color: #fff;
 // ----------------------------------------------------------------------------
 // Base styles
 // ----------------------------------------------------------------------------
-html { 
-  font-size: 100%; 
-  -webkit-text-size-adjust: 100%; 
-  -ms-text-size-adjust: 100%; 
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
 }
 
-body { 
-  margin: 0; 
+body {
+  margin: 0;
   background-color: $background-color;
   font-size: 20px;
   color: $text-color;
   font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-b, strong { 
-  font-weight: bold; 
+b, strong {
+  font-weight: bold;
 }
 
 a {
@@ -58,18 +58,18 @@ a {
   color: inherit;
 }
 
-img { 
-  border: 0; 
-  -ms-interpolation-mode: bicubic; 
-  vertical-align: middle; 
+img {
+  border: 0;
+  -ms-interpolation-mode: bicubic;
+  vertical-align: middle;
 }
 
-img, object { 
-  max-width: 100%; 
+img, object {
+  max-width: 100%;
 }
 
-iframe { 
-  max-width: 100%; 
+iframe {
+  max-width: 100%;
 }
 
 table {
@@ -82,16 +82,16 @@ td {
   vertical-align: middle;
 }
 
-ul, ol { 
-  padding: 0; 
-  margin: 0; 
+ul, ol {
+  padding: 0;
+  margin: 0;
 }
 
-h1, h2, h3, h4, h5, p { 
+h1, h2, h3, h4, h5, p {
   padding: 0;
-  margin: 0; 
+  margin: 0;
 }
-h1 { 
+h1 {
   margin-bottom: 12px;
   text-align: center;
   font-size: 30px;
@@ -124,6 +124,8 @@ h3 {
   top: 0;
   opacity: 0.1;
   font-size: 275px;
+  text-align: center;
+  margin-top: 82px;
 }
 
 .list-nostyle {
@@ -152,7 +154,7 @@ h3 {
   background-color: $background-warning-color-1;
   @include animation(status-warning-background, 2s, ease, infinite);
 
-  .icon-warning-sign { 
+  .icon-warning-sign {
     display: inline-block;
   }
 
@@ -166,7 +168,7 @@ h3 {
   background-color: $background-danger-color-1;
   @include animation(status-danger-background, 2s, ease, infinite);
 
-  .icon-warning-sign { 
+  .icon-warning-sign {
     display: inline-block;
   }
 
