@@ -11,7 +11,7 @@ Batman.Filters.dashize = (str) ->
   dashes_rx1 = /([A-Z]+)([A-Z][a-z])/g;
   dashes_rx2 = /([a-z\d])([A-Z])/g;
 
-  return str.replace(dashes_rx1, '$1_$2').replace(dashes_rx2, '$1_$2').replace('_', '-').toLowerCase()
+  return str.replace(dashes_rx1, '$1_$2').replace(dashes_rx2, '$1_$2').replace(/_/g, '-').toLowerCase()
 
 Batman.Filters.shortenedNumber = (num) ->
   return num if isNaN(num)
