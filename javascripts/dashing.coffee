@@ -2,6 +2,7 @@
 #= require es5-shim
 #= require batman
 #= require batman.jquery
+#= require moment
 
 
 Batman.Filters.prettyNumber = (num) ->
@@ -47,10 +48,8 @@ class Dashing.Widget extends Batman.View
 
   @accessor 'updatedAtMessage', ->
     if updatedAt = @get('updatedAt')
-      timestamp = new Date(updatedAt * 1000)
-      hours = timestamp.getHours()
-      minutes = ("0" + timestamp.getMinutes()).slice(-2)
-      "Last updated at #{hours}:#{minutes}"
+        now = moment()
+        "Last updated #{moment.unix(updatedAt).max(now).fromNow()}"
 
   @::on 'ready', ->
     Dashing.Widget.fire 'ready'
