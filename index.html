@@ -192,6 +192,8 @@
         <code>send_event(widget_id, json_formatted_data)</code>
         <br/>
         <p>Jobs are where you put stuff such as fetching metrics from a database, or calling a third party API like Twitter. Since the data fetch is happening in only one place, it means that all instances of widgets are in sync. <a href="http://www.html5rocks.com/en/tutorials/eventsource/basics/" target="_blank">Server Sent Events</a> are used in order to stream data to the dashboards. </p>
+
+        <p>Note that if you modify a job then Dashing needs to be restarted to pick up the changes.</p>
         <h4>API</h4>
 
         <p>Your widgets can be updated directly over HTTP. Post the data you want in json to <code>/widgets/widget_id</code>.
