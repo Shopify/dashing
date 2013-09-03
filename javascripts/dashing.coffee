@@ -94,12 +94,15 @@ Dashing.debugMode = false
 
 source = new EventSource('events')
 source.addEventListener 'open', (e) ->
-  console.log("Connection opened")
+  console.log("Connection opened", e)
 
 source.addEventListener 'error', (e)->
-  console.log("Connection error")
-  if (e.readyState == EventSource.CLOSED)
+  console.log("Connection error", e)
+  if (e.currentTarget.readyState == EventSource.CLOSED)
     console.log("Connection closed")
+    setTimeout (->
+      window.location.reload()
+    ), 5*60*1000
 
 source.addEventListener 'message', (e) ->
   data = JSON.parse(e.data)
