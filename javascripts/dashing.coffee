@@ -102,7 +102,7 @@ source.addEventListener 'error', (e)->
     console.log("Connection closed")
     setTimeout (->
       window.location.reload()
-    ), 10000
+    ), 5*60*1000
 
 source.addEventListener 'message', (e) ->
   data = JSON.parse(e.data)
