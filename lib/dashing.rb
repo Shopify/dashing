@@ -127,6 +127,9 @@ def send_event(id, body, target=nil)
   event = format_event(body.to_json, target)
   Sinatra::Application.settings.history[id] = event unless target == 'dashboards'
   Sinatra::Application.settings.connections.each { |out| out << event }
+  Firebase.base_uri = 'https://shopify-statly.firebaseio.com/'
+  Firebase.auth = 'BKF9LgpnR8HjjWTztN1DoriwkC8o6JCEAHpu9TnY'
+  Firebase.set(id, body)
 end
 
 def format_event(body, name=nil)
