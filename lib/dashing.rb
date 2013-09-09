@@ -6,6 +6,7 @@ require 'coffee-script'
 require 'sass'
 require 'json'
 require 'yaml'
+require 'firebase'
 
 SCHEDULER = Rufus::Scheduler.start_new
 
