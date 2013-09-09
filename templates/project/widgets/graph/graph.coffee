@@ -43,7 +43,7 @@ class Dashing.Graph extends Dashing.Widget
     $node.append $graph
     graph = new Rickshaw.Graph(
       element:  $graph.get(0),
-      renderer: @get('renderer') or 'area',
+      renderer: @get('renderer') or @get('graphtype') or 'area',
       stroke:   !!@get('stroke'),
       width:  width,
       height:   height,
