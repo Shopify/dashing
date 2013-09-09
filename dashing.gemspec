@@ -25,6 +25,5 @@ Gem::Specification.new do |s|
   s.add_dependency('thor')
   s.add_dependency('sprockets')
   s.add_dependency('rack')
-  s.add_dependency('firebase')
 
 end
