@@ -16,7 +16,7 @@ class Dashing.Graph extends Dashing.Widget
     return ''
 
   ready: ->
-    @colors = @get('colors').split(':') if @get('colors')
+    @assignedColors = @get('colors').split(':') if @get('colors')
     @strokeColors = @get('strokeColors').split(':') if @get('strokeColors')
 
     @graph = @_createGraph()
@@ -121,19 +121,15 @@ class Dashing.Graph extends Dashing.Widget
   # Update the color assignments for a series.  This will assign colors to any data that
   # doesn't have a color already.
   _updateColors: (series) ->
-    defaultColors = @colors
-
     # If no colors were provided, or of there aren't enough colors, then generate a set of
     # colors to use.
-    if !defaultColors or defaultColors.length < series.length
-      if @defaultColors?.length != series.length
-        @defaultColors = computeDefaultColors @node, series
-      defaultColors = @defaultColors
+    if !@defaultColors or @defaultColors?.length != series.length
+      @defaultColors = computeDefaultColors @node, series
 
     for subseries, index in series
       # Preferentially pick supplied colors instead of defaults, but don't overwrite a color
       # if one was supplied with the data.
-      subseries.color ?= @colors?[index] or defaultColors[index]
+      subseries.color ?= @assignedColors?[index] or @defaultColors[index]
       subseries.stroke ?= @strokeColors?[index] or "#000"
 
   # Convert a collection of Graphite data points into data that Rickshaw will understand.
