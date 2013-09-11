@@ -6,14 +6,12 @@ class Dashing.Graph extends Dashing.Widget
 
     # Return the value supplied if there is one.
     if @get('displayedValue') != null and @get('displayedValue') != undefined
-      console.log "Using displayedValue"
       answer = @get('displayedValue')
 
     if answer == null
       # Compute a value to return based on the summaryMethod
       series = @_parseData {points: @get('points'), series: @get('series')}
       if series?.length > 0
-        console.log "Summary Method", @get('summaryMethod')
         switch @get('summaryMethod')
           when "sum"
             answer = 0
