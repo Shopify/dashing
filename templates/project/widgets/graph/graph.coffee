@@ -41,11 +41,11 @@ class Dashing.Graph extends Dashing.Widget
               data = series[0].data
               answer = data[data.length - 1].y
             else
+              # Otherwise just return nothing.
               answer = ''
       else
         answer = '-'
 
-    # Otherwise just return nothing.
     return answer
 
   ready: ->
