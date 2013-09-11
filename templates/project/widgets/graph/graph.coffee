@@ -154,8 +154,8 @@ class Dashing.Graph extends Dashing.Widget
       luminance = hsl[2]
 
       # `quotient` should be at least `series.length + 1`, since we want to avoid pure
-      # black or pure white bars.  `+3` seems to be visually pleasing.
-      quotient = (series.length + 3)
+      # black or pure white bars.  Larger values result in graphs that are harder to read.
+      quotient = (series.length + 1)
       if luminance < 0.6
         # Choose colors that are lighter than the background
         delta = (1.0 - luminance) / quotient
