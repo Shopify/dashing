@@ -2,18 +2,51 @@ class Dashing.Graph extends Dashing.Widget
 
   # Retrieve the `current` value of the graph.
   @accessor 'current', ->
+    answer = null
+
     # Return the value supplied if there is one.
     if @get('displayedValue') != null and @get('displayedValue') != undefined
-      return @get('displayedValue')
+      console.log "Using displayedValue"
+      answer = @get('displayedValue')
 
-    # Otherwise if there's only one series, pick the most recent value from the series.
-    series = @_parseData {points: @get('points'), series: @get('series')}
-    if series?.length == 1 and series[0].data?.length > 0
-      data = series[0].data
-      return data[data.length - 1].y
+    if answer == null
+      # Compute a value to return based on the summaryMethod
+      series = @_parseData {points: @get('points'), series: @get('series')}
+      if series?.length > 0
+        console.log "Summary Method", @get('summaryMethod')
+        switch @get('summaryMethod')
+          when "sum"
+            answer = 0
+            answer += (point?.y or 0) for point in s.data for s in series
+
+          when "sumLast"
+            answer = 0
+            answer += s.data[s.data.length - 1].y or 0 for s in series
+
+          when "highest"
+            answer = 0
+            if @get('unstack')
+              answer = Math.max(answer, (point?.y or 0)) for point in s.data for s in series
+            else
+              # Compute the sum of values at each point along the graph
+              for index in [0...series[0].data.length]
+                value = 0
+                for s in series
+                  value += s.data[index]?.y or 0
+                answer = Math.max(answer, value)
+
+          else
+            # Otherwise if there's only one series, pick the most recent value from the series.
+            if series.length == 1 and series[0].data?.length > 0
+              data = series[0].data
+              answer = data[data.length - 1].y
+            else
+              answer = ''
+      else
+        answer = '-'
 
     # Otherwise just return nothing.
-    return ''
+    return answer
 
   ready: ->
     @assignedColors = @get('colors').split(':') if @get('colors')

@@ -8,7 +8,7 @@ Supported HTML data fields
 --------------------------
 
 * `data-title`: Title to display.
-* `data-displayedValue`: If provided, then the value to display overtop of the graph.  If not
+* `data-displayed-value`: If provided, then the value to display overtop of the graph.  If not
   provided, then the most recent value will be used if there is only one series.
 * `data-renderer`: Any valid Rickshaw renderer, including 'area', 'line', 'bar', 'scatterplot'.
 * `data-stroke`: If "true", then area graphs will be drawn with a stroke.
@@ -18,6 +18,13 @@ Supported HTML data fields
   `data-colors="#ccc:#ddd:#eee"`)
 * `data-stroke-colors`: A ":" separated list of colors to use for strokes.
 * `data-legend`: If "true", then a legend will be added to your graph.
+* `data-summary-method` determines how the value shown in the graph is computed.  If
+  `data-displayed-value` is set, this is ignored.  Otherwise this should be one of:
+  * "last" - Default - If there is only one series, show the most recent value from that series.
+  * "sum" - Sum of all values across all series.
+  * "sumLast" - Sum of last values across all series.
+  * "highest" - For stacked graphs, the highest single data point based on the sum of all series.
+    For unstacked graphs, the highest single data point of any series.
 
 Passing Data
 ------------
