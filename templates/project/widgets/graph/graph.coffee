@@ -223,7 +223,7 @@ class Dashing.Graph extends Dashing.Widget
     # If no colors were provided, or of there aren't enough colors, then generate a set of
     # colors to use.
     if !@defaultColors or @defaultColors?.length != series.length
-      @defaultColors = computeDefaultColors @node, series
+      @defaultColors = computeDefaultColors @, @node, series
 
     for subseries, index in series
       # Preferentially pick supplied colors instead of defaults, but don't overwrite a color
@@ -243,28 +243,26 @@ class Dashing.Graph extends Dashing.Widget
   # and picking colors of intermediate luminance between the background and white (or the
   # background and black, for light colored backgrounds.)  We use the brightest color for the
   # first series, because then multiple series will appear to blend in to the background.
-  computeDefaultColors = (node, series) ->
+  computeDefaultColors = (self, node, series) ->
     defaultColors = []
 
     # Use a neutral color if we can't get the background-color for some reason.
     backgroundColor = parseColor($(node).css('background-color')) or [50, 50, 50, 1.0]
     if backgroundColor
       hsl = rgbToHsl backgroundColor
-      luminance = hsl[2]
 
-      # `quotient` should be greated than `series.length`, since we want to avoid pure
-      # black or pure white bars.  Lower values will result in better contrast between differnet
-      # series.
-      quotient = (series.length + 1)
-      if luminance < 0.6
-        # Choose colors that are lighter than the background
-        delta = (1.0 - luminance) / quotient
-      else
-        # Choose colors that are darker than the background
-        delta = -(luminance / quotient)
+      saturation = hsl[1]
+      saturationSource = if (saturation < 0.6) then 0.7 else 0.3
+      saturations = interpolate saturationSource, saturation, (series.length + 1)
+
+      luminance = hsl[2]
+      luminanceSource = if (luminance < 0.6) then 0.9 else 0.1
+      luminances = interpolate luminanceSource, luminance, (series.length + 1)
+      console.log "#{self.get 'id'}", series.length, luminance, luminances
 
       for index in [0...series.length]
-        hsl[2] = luminance + (series.length - index) * delta
+        hsl[1] = saturations[index]
+        hsl[2] = luminances[index]
         defaultColors[index] = rgbToColor hslToRgb(hsl)
 
     return defaultColors
@@ -316,6 +314,20 @@ rgbToColor = (rgb) ->
     return "rgb(#{rgb[0]},#{rgb[1]},#{rgb[2]})"
   else
     return "rgba(#{rgb[0]},#{rgb[1]},#{rgb[2]},#{rgb[3]})"
+
+# Returns an array of size `steps`, where the first value is `source`, the last value is `dest`,
+# and the intervening values are interpolated.  If steps < 2, then returns `[dest]`.
+#
+interpolate = (source, dest, steps) ->
+  if steps < 2
+    answer =[dest]
+  else
+    stepSize = (dest - source) / (steps - 1)
+    answer = (num for num in [source..dest] by stepSize)
+    # Rounding errors can cause us to drop the last value
+    if answer.length < steps then answer.push dest
+
+  return answer
 
 # Adapted from http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c
 #
