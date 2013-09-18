@@ -1,5 +1,25 @@
 class Dashing.Graph extends Dashing.Widget
 
+  DIVISORS = [
+      {number: 100000000000000000000000,  label: 'Y'},
+      {number: 100000000000000000000,     label: 'Z'},
+      {number: 100000000000000000,        label: 'E'},
+      {number: 1000000000000000,          label: 'P'},
+      {number: 1000000000000,             label: 'T'},
+      {number: 1000000000,                label: 'G'},
+      {number: 1000000,                   label: 'M'},
+      {number: 1000,                      label: 'K'}
+  ]
+
+  # Take a long number like "2356352" and turn it into "2.4M"
+  formatNumber = (number) ->
+      for divisior in DIVISORS
+          if number > divisior.number
+              number = "#{Math.round(number / (divisior.number/10))/10}#{divisior.label}"
+              break
+
+      return number
+
   # Retrieve the `current` value of the graph.
   @accessor 'current', ->
     answer = null
@@ -11,7 +31,11 @@ class Dashing.Graph extends Dashing.Widget
     if answer == null
       # Compute a value to return based on the summaryMethod
       series = @_parseData {points: @get('points'), series: @get('series')}
-      if series?.length > 0
+      if !(series?.length > 0)
+        # No data in series
+        answer = ''
+
+      else
         switch @get('summaryMethod')
           when "sum"
             answer = 0
@@ -33,6 +57,9 @@ class Dashing.Graph extends Dashing.Widget
                   value += s.data[index]?.y or 0
                 answer = Math.max(answer, value)
 
+          when "none"
+            answer = ''
+
           else
             # Otherwise if there's only one series, pick the most recent value from the series.
             if series.length == 1 and series[0].data?.length > 0
@@ -41,10 +68,11 @@ class Dashing.Graph extends Dashing.Widget
             else
               # Otherwise just return nothing.
               answer = ''
-      else
-        answer = '-'
+
+        answer = formatNumber answer
 
     return answer
+
 
   ready: ->
     @assignedColors = @get('colors').split(':') if @get('colors')
@@ -53,15 +81,40 @@ class Dashing.Graph extends Dashing.Widget
     @graph = @_createGraph()
     @graph.render()
 
+  clear: ->
+    # Remove the old graph/legend if there is one.
+    $node = $(@node)
+    $node.find('.rickshaw_graph').remove()
+    if @$legendDiv
+      @$legendDiv.remove()
+      @$legendDiv = null
+
   # Handle new data from Dashing.
   onData: (data) ->
-    @_parseData data
-    @graph?.render()
+    series = @_parseData data
+
+    if @graph
+      # Remove the existing graph if the number of series has changed or any names have changed.
+      needClear = false
+      needClear |= (series.length != @graph.series.length)
+      if @get("legend") then for subseries, index in series
+        needClear |= @graph.series[index]?.name != series[index]?.name
+
+      if needClear then @graph = @_createGraph()
+
+      # Copy over the new graph data
+      for subseries, index in series
+        @graph.series[index] = subseries
+
+      @graph.render()
 
   # Create a new Rickshaw graph.
   _createGraph: ->
     $node = $(@node)
     $container = $node.parent()
+
+    @clear()
+
     # Gross hacks. Let's fix this.
     width = (Dashing.widget_base_dimensions[0] * $container.data("sizex")) + Dashing.widget_margins[0] * 2 * ($container.data("sizex") - 1)
     height = (Dashing.widget_base_dimensions[1] * $container.data("sizey"))
@@ -72,14 +125,21 @@ class Dashing.Graph extends Dashing.Widget
 
     $graph = $("<div style='height: #{height}px;'></div>")
     $node.append $graph
-    graph = new Rickshaw.Graph(
+    series = @_parseData {points: @get('points'), series: @get('series')}
+
+    graphOptions = {
       element:  $graph.get(0),
       renderer: @get('renderer') or @get('graphtype') or 'area',
-      stroke:   !!@get('stroke'),
-      width:  width,
+      width:    width,
       height:   height,
-      series:   @_parseData {points: @get('points'), series: @get('series')}
-    )
+      series:   series
+    }
+
+    if !!@get('stroke') then graphOptions.stroke = true
+    if @get('min') != null then graphOptions.max = @get('min')
+    if @get('max') != null then graphOptions.max = @get('max')
+
+    graph = new Rickshaw.Graph graphOptions
     graph.renderer.unstack = !!@get('unstack')
 
     x_axis = new Rickshaw.Graph.Axis.Time(graph: graph)
@@ -87,27 +147,28 @@ class Dashing.Graph extends Dashing.Widget
 
     if @get("legend")
       # Add a legend
-      $legendDiv = $("<div style='width: #{width}px;'></div>")
-      $node.append($legendDiv)
+      @$legendDiv = $("<div style='width: #{width}px;'></div>")
+      $node.append(@$legendDiv)
       legend = new Rickshaw.Graph.Legend {
         graph: graph
-        element: $legendDiv.get(0)
+        element: @$legendDiv.get(0)
       }
 
     return graph
 
   # Parse a {series, points} object with new data from Dashing.
   #
-  # If there is a graph, this will update it.  If not, this will return a new `series` object,
-  # suitable for creating a new graph.
   _parseData: (data) ->
-    series = @graph?.series or []
+    series = []
 
     # Figure out what kind of data we've been passed
     if data.series
       dataSeries = if isString(data.series) then JSON.parse data.series else data.series
       for subseries, index in dataSeries
-        series[index] = @_parseSeries subseries
+        try
+          series.push @_parseSeries subseries
+        catch err
+          console.log "Error while parsing series: #{err}"
 
     else if data.points
       points = data.points
@@ -117,10 +178,11 @@ class Dashing.Graph extends Dashing.Widget
         # Not already in Rickshaw format; assume graphite data
         points = graphiteDataToRickshaw(points)
 
-      series[0] = {data: points}
-    else
+      series.push {data: points}
+
+    if series.length is 0
       # No data - create a dummy series to keep Rickshaw happy
-      series = [{data: [{x:0, y:0}]}]
+      series.push {data: [{x:0, y:0}]}
 
     @_updateColors(series)
 
@@ -129,7 +191,7 @@ class Dashing.Graph extends Dashing.Widget
   # Parse a series of data from an array passed to `_parseData()`.
   # This accepts both Graphite and Rickshaw style data sets.
   _parseSeries: (series) ->
-    if series.datapoints?
+    if series?.datapoints?
       # This is a Graphite series
       answer = {
         name: series.target
@@ -137,7 +199,7 @@ class Dashing.Graph extends Dashing.Widget
         color: series.color
         stroke: series.stroke
       }
-    else if series.data?
+    else if series?.data?
       # Rickshaw data.  Need to clone, otherwise we could end up with multiple graphs sharing
       # the same data, and Rickshaw really doesn't like that.
       answer = {
@@ -146,8 +208,14 @@ class Dashing.Graph extends Dashing.Widget
         color:  series.color
         stroke: series.stroke
       }
+    else if !series
+      throw new Error("No data received for #{@get 'id'}")
     else
-      throw new Error("Unknown data series: #{series}")
+      throw new Error("Unknown data for #{@get 'id'}.  series: #{series}")
+
+    answer.data.sort (a,b) -> a.x - b.x
+
+    return answer
 
   # Update the color assignments for a series.  This will assign colors to any data that
   # doesn't have a color already.
@@ -184,8 +252,9 @@ class Dashing.Graph extends Dashing.Widget
       hsl = rgbToHsl backgroundColor
       luminance = hsl[2]
 
-      # `quotient` should be at least `series.length + 1`, since we want to avoid pure
-      # black or pure white bars.  Larger values result in graphs that are harder to read.
+      # `quotient` should be greated than `series.length`, since we want to avoid pure
+      # black or pure white bars.  Lower values will result in better contrast between differnet
+      # series.
       quotient = (series.length + 1)
       if luminance < 0.6
         # Choose colors that are lighter than the background
