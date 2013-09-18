@@ -258,7 +258,6 @@ class Dashing.Graph extends Dashing.Widget
       luminance = hsl[2]
       luminanceSource = if (luminance < 0.6) then 0.9 else 0.1
       luminances = interpolate luminanceSource, luminance, (series.length + 1)
-      console.log "#{self.get 'id'}", series.length, luminance, luminances
 
       for index in [0...series.length]
         hsl[1] = saturations[index]
