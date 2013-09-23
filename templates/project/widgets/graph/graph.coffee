@@ -185,6 +185,7 @@ class Dashing.Graph extends Dashing.Widget
       series.push {data: [{x:0, y:0}]}
 
     @_updateColors(series)
+    @_fixLengths(series)
 
     return series
 
@@ -231,6 +232,25 @@ class Dashing.Graph extends Dashing.Widget
       subseries.color ?= @assignedColors?[index] or @defaultColors[index]
       subseries.stroke ?= @strokeColors?[index] or "#000"
 
+  # Make sure all series are the same lengths
+  _fixLengths: (series) ->
+    minLength = null
+    for subseries in series
+      if subseries?.data?.length
+        if minLength == null
+          minLength = subseries?.data?.length
+        else
+          minLength = Math.min(minLength, subseries?.data?.length)
+
+    if minLength
+      for subseries in series
+        if subseries?.data?.length > minLength
+          if Math.abs(subseries?.data?.length - minLength) < 2
+            console.log "#{@get 'id'} - Warning: Series #{subseries.name or ""} has length #{subseries.data.length} which is longer than minimum series length #{minLength}"
+            subseries.data.length = minLength
+          else
+            console.log "#{@get 'id'} - Error: Series #{subseries.name or ""} has incorrect length: #{subseries.data.length} > #{minLength}"
+
   # Convert a collection of Graphite data points into data that Rickshaw will understand.
   graphiteDataToRickshaw = (datapoints) ->
     answer = []
@@ -248,8 +268,32 @@ class Dashing.Graph extends Dashing.Widget
 
     # Use a neutral color if we can't get the background-color for some reason.
     backgroundColor = parseColor($(node).css('background-color')) or [50, 50, 50, 1.0]
-    if backgroundColor
-      hsl = rgbToHsl backgroundColor
+    hsl = rgbToHsl backgroundColor
+
+    alpha = if self.get('defaultAlpha')? then self.get('defaultAlpha') else 1
+
+    if self.get('colorScheme') in ['rainbow', 'near-rainbow']
+      saturation = (interpolate hsl[1], 1.0, 3)[1]
+      luminance = if (hsl[2] < 0.6) then 0.7 else 0.3
+
+      hueOffset = 0
+      if self.get('colorScheme') is 'rainbow'
+        # Note the first and last values in `hues` will both have the same hue as the background,
+        # hence the + 2.
+        hues = interpolate hsl[0], hsl[0] + 1, (series.length + 2)
+        hueOffset = 1
+      else
+        hues = interpolate hsl[0] - 0.25, hsl[0] + 0.25, series.length
+      for hue, index in hues
+        if hue > 1 then hues[index] -= 1
+        if hue < 0 then hues[index] += 1
+
+      for index in [0...series.length]
+        defaultColors[index] = rgbToColor hslToRgb([hues[index + hueOffset], saturation, luminance, alpha])
+
+    else
+      hue = if self.get('colorScheme') is "compliment" then hsl[0] + 0.5 else hsl[0]
+      if hsl[0] > 1 then hsl[0] -= 1
 
       saturation = hsl[1]
       saturationSource = if (saturation < 0.6) then 0.7 else 0.3
@@ -260,9 +304,7 @@ class Dashing.Graph extends Dashing.Widget
       luminances = interpolate luminanceSource, luminance, (series.length + 1)
 
       for index in [0...series.length]
-        hsl[1] = saturations[index]
-        hsl[2] = luminances[index]
-        defaultColors[index] = rgbToColor hslToRgb(hsl)
+        defaultColors[index] = rgbToColor hslToRgb([hue, saturations[index], luminances[index], alpha])
 
     return defaultColors
 

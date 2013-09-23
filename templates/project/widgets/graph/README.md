@@ -17,7 +17,11 @@ Supported HTML data fields
   provided than there are series to graph, then pleasing colors will be automatically chosen.  (e.g.:
   `data-colors="#ccc:#ddd:#eee"`)
 * `data-stroke-colors`: A ":" separated list of colors to use for strokes.
+* `data-color-scheme`: One of "rainbow", "near-rainbow", "compliment", "default".  Controls how
+  default colors are assigned.
+* `data-default-alpha`: Alpha for default colors.
 * `data-legend`: If "true", then a legend will be added to your graph.
+# `data-min` and `data-max`: Set the highest and lowest values of the y-axis.
 * `data-summary-method` determines how the value shown in the graph is computed.  If
   `data-displayed-value` is set, this is ignored.  Otherwise this should be one of:
   * "last" - Default - If there is only one series, show the most recent value from that series.
