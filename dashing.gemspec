@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name        = 'dashing'
-  s.version     = '1.2.0'
+  s.version     = '1.3.0'
   s.date        = '2013-07-29'
   s.executables << 'dashing'
 
@@ -21,7 +21,11 @@ Gem::Specification.new do |s|
   s.add_dependency('sinatra')
   s.add_dependency('sinatra-contrib')
   s.add_dependency('thin')
+<<<<<<< HEAD
   s.add_dependency('rufus-scheduler', '>=3.0.0')
+=======
+  s.add_dependency('rufus-scheduler', '~> 2.0')
+>>>>>>> upstream/master
   s.add_dependency('thor')
   s.add_dependency('sprockets')
   s.add_dependency('rack')
