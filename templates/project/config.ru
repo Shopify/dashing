@@ -1,5 +1,5 @@
 require 'dashing'
-require 'SecureRandom'
+require 'securerandom'
 
 configure do
   set :auth_token, ENV['AUTH_TOKEN'] || SecureRandom.uuid
