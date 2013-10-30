@@ -8,6 +8,7 @@ require 'json'
 require 'yaml'
 
 SCHEDULER = Rufus::Scheduler.start_new
+KEYS      = {}
 
 set :root, Dir.pwd
 
