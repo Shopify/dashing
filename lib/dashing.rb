@@ -8,7 +8,6 @@ require 'json'
 require 'yaml'
 
 SCHEDULER = Rufus::Scheduler.start_new
-KEYS      = {}
 
 set :root, Dir.pwd
 
@@ -153,6 +152,11 @@ def tilt_html_engines
     default_mime_type = engines.first.default_mime_type
     default_mime_type.nil? || default_mime_type == 'text/html'
   end
+end
+
+settings_file = File.join(settings.root, 'config/settings.rb')
+if (File.exists?(settings_file))
+  require settings_file
 end
 
 Dir[File.join(settings.root, 'lib', '**', '*.rb')].each {|file| require file }
