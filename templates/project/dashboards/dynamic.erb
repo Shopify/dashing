@@ -15,9 +15,9 @@ $(function() {
     <% widgets.each do |widget| %>
       <% attrs = widget[:attributes] || {}
          attrs['data-id'] = widget[:event] if widget[:event]
-         attrs['data-view'] = widget[:view]  
-         attrs['data-title'] = widget[:title]  
-         (widget[:data] || {}).each {|k,v| attrs["data-#{k}"] = v } %>
+         attrs['data-view'] = widget[:view]
+         attrs['data-title'] = widget[:title]
+         (widget[:data] || {}).each {|k,v| attrs["data-#{k}"] = v.to_json } %>
       <li data-row="<%= widget[:row] || 1 %>" data-col="<%= widget[:col] || 1 %>" data-sizex="<%= widget[:sizex] || 1 %>" data-sizey="<%= widget[:sizey] || 1 %>">
         <div <%= attrs.map{|attr, value| "#{attr}='#{value}'"}.join(" ") %>></div>
         <% if icon = widget[:background_icon] %>
@@ -27,3 +27,4 @@ $(function() {
     <% end %>
   </ul>
 </div>
+
