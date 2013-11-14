@@ -22,9 +22,7 @@ set server: 'thin', connections: [], history_file: 'history.yml'
 
 # Persist history in tmp file at exit
 at_exit do
-  File.open(settings.history_file, 'w') do |f|
-    f.puts settings.history.to_yaml
-  end
+  persist_history
 end
 
 if File.exists?(settings.history_file)
@@ -109,6 +107,19 @@ post '/widgets/:id' do
   end
 end
 
+post '/system/persist-history' do
+  request.body.rewind
+  body = JSON.parse(request.body.read)
+  auth_token = body.delete("auth_token")
+  if !settings.auth_token || settings.auth_token == auth_token
+    persist_history
+    204 # response without entity body
+  else
+    status 401
+    "Invalid API key\n"
+  end
+end
+
 not_found do
   send_file File.join(settings.public_folder, '404.html')
 end
@@ -151,6 +162,12 @@ def tilt_html_engines
   Tilt.mappings.select do |_, engines|
     default_mime_type = engines.first.default_mime_type
     default_mime_type.nil? || default_mime_type == 'text/html'
+  end
+end
+
+def persist_history
+  File.open(settings.history_file, 'w') do |f|
+    f.puts settings.history.to_yaml
   end
 end
 
