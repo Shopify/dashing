@@ -1,0 +1,88 @@
+{
+  "dashboards": {
+
+    "sample-dyn": {
+      "title": "Sample Dashboard",
+
+      "widgets": [
+        {
+          "title": "Hello",
+          "view": "Text",
+          "event": "welcome",
+          "sizex": 2,
+          "data": {
+            "text" : "This is your shiny new dashboard",
+            "moreinfo": "Protip: You can drag the widgets around!"
+          }
+        },
+        {
+          "title" : "Synergy",
+          "view"  : "Meter",
+          "event" : "synergy",
+          "data": {
+            "min": 0,
+            "max": 100
+          }
+        },
+        {
+          "title": "Buzzwords",
+          "view": "List",
+          "event": "buzzwords",
+          "sizey": 2,
+          "data": {
+            "unordered": true,
+            "moreinfo": "# of times said around the office"
+          }
+        },
+        {
+          "title" : "Current Valuation",
+          "view"  : "Number",
+          "event" : "valuation",
+          "data": {
+            "moreinfo": "in billions",
+            "prefix": "$"
+          }
+        },
+        {
+          "title" : "Convergence",
+          "view"  : "Graph",
+          "event" : "convergence",
+          "sizex" : 2,
+          "attributes": {
+            "style": "background-color:#ff9618"
+          }
+        },
+        {
+          "view": "Comments",
+          "event": "twitter-beer",
+          "sizex": 2,
+          "background_icon": "twitter"
+        },
+        {
+          "view"  : "Clock",
+          "background_icon" : "time",
+          "attributes": {
+            "style": "background-color: #FF77A8"
+          }
+        },
+        {
+          "view"  : "Image",
+          "data"  : {
+            "image": "/logo.png"
+          }
+        }
+      ]
+    }
+  },
+
+  "jobs": [
+    {
+      "event" : "twitter-beer",
+      "class" : "TwitterSearch",
+      "every" : "10m",
+      "data"  : {
+        "search_term": "beer -root"
+      }
+    }
+  ]
+}
