@@ -26,4 +26,5 @@ Gem::Specification.new do |s|
   s.add_dependency('sprockets')
   s.add_dependency('rack')
 
+  s.add_development_dependency('simplecov', '~> 0.8.0')
 end

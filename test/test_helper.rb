@@ -1,7 +1,18 @@
 require 'rack/test'
 require 'stringio'
+require 'simplecov'  # Must be required before test framework
 require 'test/unit'
 require 'tmpdir'
+
+SimpleCov.command_name 'MiniTest'
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  SimpleCov::Formatter::HTMLFormatter
+]
+
+# Must be called before the rest of the app runs
+SimpleCov.start do
+  add_filter '/test/'
+end
 
 ENV['RACK_ENV'] = 'test'
 WORKING_DIRECTORY = Dir.pwd.freeze
