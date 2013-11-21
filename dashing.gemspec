@@ -2,8 +2,8 @@
 
 Gem::Specification.new do |s|
   s.name        = 'dashing'
-  s.version     = '1.3.1'
-  s.date        = '2013-07-29'
+  s.version     = '1.3.2'
+  s.date        = '2013-11-21'
   s.executables << 'dashing'
 
 
@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency('sass')
   s.add_dependency('coffee-script', '>=1.6.2')
+  s.add_dependency('execjs', '>=2.0.0')
   s.add_dependency('sinatra')
   s.add_dependency('sinatra-contrib')
   s.add_dependency('thin')
