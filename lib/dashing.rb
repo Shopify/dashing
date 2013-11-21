@@ -50,7 +50,6 @@ get '/events', provides: 'text/event-stream' do
   response.headers['X-Accel-Buffering'] = 'no' # Disable buffering for nginx
   stream :keep_open do |out|
     settings.connections << out
-    out << latest_events
     out.callback { settings.connections.delete(out) }
   end
 end
@@ -62,6 +61,11 @@ get '/' do
   rescue NoMethodError => e
     raise Exception.new("There are no dashboards in your dashboard directory.")
   end
+end
+
+get '/latest' do
+  settings.connections.each { |out| out << latest_events }
+  200
 end
 
 get '/:dashboard' do
