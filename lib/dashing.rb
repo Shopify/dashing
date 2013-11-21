@@ -7,7 +7,7 @@ require 'sass'
 require 'json'
 require 'yaml'
 
-SCHEDULER = Rufus::Scheduler.start_new
+SCHEDULER = Rufus::Scheduler.new
 
 set :root, Dir.pwd
 
