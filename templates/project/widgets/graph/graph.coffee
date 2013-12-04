@@ -20,6 +20,8 @@ class Dashing.Graph extends Dashing.Widget
 
       return number
 
+  getRenderer: () -> return @get('renderer') or @get('graphtype') or 'area'
+
   # Retrieve the `current` value of the graph.
   @accessor 'current', ->
     answer = null
@@ -47,7 +49,7 @@ class Dashing.Graph extends Dashing.Widget
 
           when "highest"
             answer = 0
-            if @get('unstack')
+            if @get('unstack') or (@getRenderer() is "line")
               answer = Math.max(answer, (point?.y or 0)) for point in s.data for s in series
             else
               # Compute the sum of values at each point along the graph
@@ -129,7 +131,7 @@ class Dashing.Graph extends Dashing.Widget
 
     graphOptions = {
       element:  $graph.get(0),
-      renderer: @get('renderer') or @get('graphtype') or 'area',
+      renderer: @getRenderer(),
       width:    width,
       height:   height,
       series:   series
@@ -139,10 +141,38 @@ class Dashing.Graph extends Dashing.Widget
     if @get('min') != null then graphOptions.max = @get('min')
     if @get('max') != null then graphOptions.max = @get('max')
 
-    graph = new Rickshaw.Graph graphOptions
+    try
+      graph = new Rickshaw.Graph graphOptions
+    catch err
+      if err.toString() is "x and y properties of points should be numbers instead of number and object"
+        # This will happen with older versions of Rickshaw that don't support nulls in the data set.
+        nullsFound = false
+        for s in series
+          for point in s.data
+            if point.y is null
+              nullsFound = true
+              point.y = 0
+
+        if nullsFound
+          # Try to create the graph again now that we've patched up the data.
+          graph = new Rickshaw.Graph graphOptions
+          if !@rickshawVersionWarning
+            console.log "#{@get 'id'} - Nulls were found in your data, but Rickshaw didn't like" +
+              " them.  Consider upgrading your rickshaw to 1.4.3 or higher."
+            @rickshawVersionWarning = true
+        else
+          # No nulls were found - this is some other problem, so just re-throw the exception.
+          throw err
+
     graph.renderer.unstack = !!@get('unstack')
 
-    x_axis = new Rickshaw.Graph.Axis.Time(graph: graph)
+    xAxisOptions =  {
+      graph: graph
+    }
+    if Rickshaw.Fixtures.Time.Local
+      xAxisOptions.timeFixture = new Rickshaw.Fixtures.Time.Local()
+
+    x_axis = new Rickshaw.Graph.Axis.Time xAxisOptions
     y_axis = new Rickshaw.Graph.Axis.Y(graph: graph, tickFormat: Rickshaw.Fixtures.Number.formatKMBT)
 
     if @get("legend")
@@ -185,7 +215,9 @@ class Dashing.Graph extends Dashing.Widget
       series.push {data: [{x:0, y:0}]}
 
     @_updateColors(series)
-    @_fixLengths(series)
+
+    # Fix any missing data in the series.
+    if Rickshaw.Series.fill then Rickshaw.Series.fill(series, null)
 
     return series
 
@@ -231,25 +263,6 @@ class Dashing.Graph extends Dashing.Widget
       # if one was supplied with the data.
       subseries.color ?= @assignedColors?[index] or @defaultColors[index]
       subseries.stroke ?= @strokeColors?[index] or "#000"
-
-  # Make sure all series are the same lengths
-  _fixLengths: (series) ->
-    minLength = null
-    for subseries in series
-      if subseries?.data?.length
-        if minLength == null
-          minLength = subseries?.data?.length
-        else
-          minLength = Math.min(minLength, subseries?.data?.length)
-
-    if minLength
-      for subseries in series
-        if subseries?.data?.length > minLength
-          if Math.abs(subseries?.data?.length - minLength) < 2
-            console.log "#{@get 'id'} - Warning: Series #{subseries.name or ""} has length #{subseries.data.length} which is longer than minimum series length #{minLength}"
-            subseries.data.length = minLength
-          else
-            console.log "#{@get 'id'} - Error: Series #{subseries.name or ""} has incorrect length: #{subseries.data.length} > #{minLength}"
 
   # Convert a collection of Graphite data points into data that Rickshaw will understand.
   graphiteDataToRickshaw = (datapoints) ->
@@ -428,4 +441,3 @@ hslToRgb = (hsla) ->
     b = hue2rgb(p, q, h - 1/3)
 
   return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255), a]
-
