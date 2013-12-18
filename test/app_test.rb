@@ -1,11 +1,10 @@
 require 'test_helper'
 require 'haml'
 
-Sinatra::Application.settings.history_file = File.join(Dir.tmpdir, 'history.yml')
-
 class AppTest < Dashing::Test
   def setup
     @connection = []
+    Sinatra::Application.settings.history_file = File.join(Dir.tmpdir, 'history.yml')
     Sinatra::Application.settings.connections = [@connection]
     Sinatra::Application.settings.auth_token = nil
     Sinatra::Application.settings.default_dashboard = nil
@@ -83,15 +82,15 @@ class AppTest < Dashing::Test
     with_generated_project do
       get '/sampletv'
       assert_equal 200, last_response.status
-      assert_include last_response.body, 'class="gridster"'
-      assert_include last_response.body, "DOCTYPE"
+      assert_includes last_response.body, 'class="gridster"'
+      assert_includes last_response.body, "DOCTYPE"
     end
   end
 
   def test_page_title_set_correctly
     with_generated_project do
       get '/sampletv'
-      assert_include last_response.body, '<title>1080p dashboard</title>'
+      assert_includes last_response.body, '<title>1080p dashboard</title>'
     end
   end
 
@@ -100,7 +99,7 @@ class AppTest < Dashing::Test
       File.write(File.join(dir, 'dashboards/hamltest.haml'), '.gridster')
       get '/hamltest'
       assert_equal 200, last_response.status
-      assert_include last_response.body, "class='gridster'"
+      assert_includes last_response.body, "class='gridster'"
     end
   end
 
@@ -110,7 +109,7 @@ class AppTest < Dashing::Test
       File.unlink(File.join(dir, 'widgets/clock/clock.html'))
       get '/views/clock.html'
       assert_equal 200, last_response.status
-      assert_include last_response.body, '<h1>haml</h1>'
+      assert_includes last_response.body, '<h1>haml</h1>'
     end
   end
 
@@ -125,7 +124,7 @@ class AppTest < Dashing::Test
     with_generated_project do
       get '/views/meter.html'
       assert_equal 200, last_response.status
-      assert_include last_response.body, 'class="meter"'
+      assert_includes last_response.body, 'class="meter"'
     end
   end
 

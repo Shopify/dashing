@@ -1,5 +1,5 @@
 require 'test_helper'
-silent{ load 'bin/dashing' }
+load_quietly 'bin/dashing'
 
 module Thor::Actions
   def source_paths
@@ -12,7 +12,7 @@ class CliTest < Dashing::Test
   def test_project_directory_created
     temp do |dir|
       cli = Dashing::CLI.new
-      silent{ cli.new 'Dashboard' }
+      silent { cli.new 'Dashboard' }
       assert Dir.exist?(File.join(dir,'dashboard')), 'Dashing directory was not created.'
     end
   end
