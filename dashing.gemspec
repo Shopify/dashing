@@ -11,20 +11,19 @@ Gem::Specification.new do |s|
   s.description = "This framework lets you build & easily layout dashboards with your own custom widgets. Use it to make a status boards for your ops team, or use it to track signups, conversion rates, or whatever else metrics you'd like to see in one spot. Included with the framework are ready-made widgets for you to use or customize. All of this code was extracted out of a project at Shopify that displays dashboards on TVs around the office."
   s.author      = "Daniel Beauchamp"
   s.email       = 'daniel.beauchamp@shopify.com'
-  s.files       = ["lib/Dashing.rb"]
   s.homepage    = 'http://shopify.github.com/dashing'
 
   s.files = Dir['README.md', 'javascripts/**/*', 'templates/**/*','templates/**/.[a-z]*', 'lib/**/*']
 
-  s.add_dependency('sass')
-  s.add_dependency('coffee-script', '>=1.6.2')
-  s.add_dependency('execjs', '>=2.0.0')
-  s.add_dependency('sinatra')
-  s.add_dependency('sinatra-contrib')
-  s.add_dependency('thin')
-  s.add_dependency('rufus-scheduler', '~> 2.0')
-  s.add_dependency('thor')
-  s.add_dependency('sprockets')
-  s.add_dependency('rack')
+  s.add_dependency('sass', '~> 3.2.12')
+  s.add_dependency('coffee-script', '~> 2.2.0')
+  s.add_dependency('execjs', '~> 2.0.2')
+  s.add_dependency('sinatra', '~> 1.4.4')
+  s.add_dependency('sinatra-contrib', '~> 1.4.2')
+  s.add_dependency('thin', '~> 1.6.1')
+  s.add_dependency('rufus-scheduler', '~> 3.0.3')
+  s.add_dependency('thor', '~> 0.18.1')
+  s.add_dependency('sprockets', '~> 2.10.1')
+  s.add_dependency('rack', '~> 1.5.2')
 
 end
