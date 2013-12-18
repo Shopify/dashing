@@ -1,5 +1,6 @@
 require 'test_helper'
-require File.expand_path('../../lib/dashing', __FILE__)
+require 'haml'
+
 Sinatra::Application.settings.history_file = File.join(Dir.tmpdir, 'history.yml')
 
 class AppTest < Dashing::Test
@@ -94,29 +95,23 @@ class AppTest < Dashing::Test
     end
   end
 
-  begin
-    require 'haml'
-
-    def test_get_haml_dashboard
-      with_generated_project do |dir|
-        File.write(File.join(dir, 'dashboards/hamltest.haml'), '.gridster')
-        get '/hamltest'
-        assert_equal 200, last_response.status
-        assert_include last_response.body, "class='gridster'"
-      end
+  def test_get_haml_dashboard
+    with_generated_project do |dir|
+      File.write(File.join(dir, 'dashboards/hamltest.haml'), '.gridster')
+      get '/hamltest'
+      assert_equal 200, last_response.status
+      assert_include last_response.body, "class='gridster'"
     end
+  end
 
-    def test_get_haml_widget
-      with_generated_project do |dir|
-        File.write(File.join(dir, 'widgets/clock/clock.haml'), '%h1 haml')
-        File.unlink(File.join(dir, 'widgets/clock/clock.html'))
-        get '/views/clock.html'
-        assert_equal 200, last_response.status
-        assert_include last_response.body, '<h1>haml</h1>'
-      end
+  def test_get_haml_widget
+    with_generated_project do |dir|
+      File.write(File.join(dir, 'widgets/clock/clock.haml'), '%h1 haml')
+      File.unlink(File.join(dir, 'widgets/clock/clock.html'))
+      get '/views/clock.html'
+      assert_equal 200, last_response.status
+      assert_include last_response.body, '<h1>haml</h1>'
     end
-  rescue LoadError
-    puts "[skipping haml tests because haml isn't installed]"
   end
 
   def test_get_nonexistent_dashboard

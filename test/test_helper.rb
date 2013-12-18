@@ -2,6 +2,7 @@ require 'rack/test'
 require 'stringio'
 require 'test/unit'
 require 'tmpdir'
+require_relative '../lib/dashing'
 
 ENV['RACK_ENV'] = 'test'
 WORKING_DIRECTORY = Dir.pwd.freeze
