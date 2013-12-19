@@ -7,6 +7,9 @@ require 'sass'
 require 'json'
 require 'yaml'
 
+require 'dashing/cli'
+require 'dashing/downloader'
+
 SCHEDULER = Rufus::Scheduler.new
 
 set :root, Dir.pwd

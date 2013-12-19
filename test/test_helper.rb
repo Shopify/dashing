@@ -1,11 +1,14 @@
 require 'rack/test'
 require 'stringio'
 require 'tmpdir'
-
+require 'fakeweb'
 require 'minitest/autorun'
 require 'minitest/pride'
+require 'mocha/setup'
 
 require_relative '../lib/dashing'
+
+FakeWeb.allow_net_connect = false
 
 ENV['RACK_ENV'] = 'test'
 WORKING_DIRECTORY = Dir.pwd.freeze
