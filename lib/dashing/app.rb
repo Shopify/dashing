@@ -9,23 +9,30 @@ require 'yaml'
 
 SCHEDULER = Rufus::Scheduler.new
 
-set :root, Dir.pwd
+def development?
+  ENV['RACK_ENV'] == 'development'
+end
 
+def production?
+  ENV['RACK_ENV'] == 'production'
+end
+
+helpers Sinatra::ContentFor
+helpers do
+  def protected!
+    # override with auth logic
+  end
+end
+
+set :root, Dir.pwd
 set :sprockets,     Sprockets::Environment.new(settings.root)
 set :assets_prefix, '/assets'
 set :digest_assets, false
-['assets/javascripts', 'assets/stylesheets', 'assets/fonts', 'assets/images', 'widgets', File.expand_path('../../javascripts', __FILE__)]. each do |path|
-  settings.sprockets.append_path path
-end
-
 set server: 'thin', connections: [], history_file: 'history.yml'
-
-# Persist history in tmp file at exit
-at_exit do
-  File.open(settings.history_file, 'w') do |f|
-    f.puts settings.history.to_yaml
-  end
-end
+set :public_folder, File.join(settings.root, 'public')
+set :views, File.join(settings.root, 'dashboards')
+set :default_dashboard, nil
+set :auth_token, nil
 
 if File.exists?(settings.history_file)
   set history: YAML.load_file(settings.history_file)
@@ -33,16 +40,28 @@ else
   set history: {}
 end
 
-set :public_folder, File.join(settings.root, 'public')
-set :views, File.join(settings.root, 'dashboards')
-set :default_dashboard, nil
-set :auth_token, nil
+%w(javascripts stylesheets fonts images).each do |path|
+  settings.sprockets.append_path("assets/#{path}")
+end
 
-helpers Sinatra::ContentFor
-helpers do
-  def protected!
-    # override with auth logic
-  end
+['widgets', File.expand_path('../../javascripts', __FILE__)]. each do |path|
+  settings.sprockets.append_path(path)
+end
+
+not_found do
+  send_file File.join(settings.public_folder, '404.html')
+end
+
+at_exit do
+  File.write(settings.history_file, settings.history.to_yaml)
+end
+
+get '/' do
+  protected!
+  dashboard = settings.default_dashboard || first_dashboard
+  raise Exception.new('There are no dashboards available') if not dashboard
+
+  redirect "/" + dashboard
 end
 
 get '/events', provides: 'text/event-stream' do
@@ -55,15 +74,6 @@ get '/events', provides: 'text/event-stream' do
   end
 end
 
-get '/' do
-  protected!
-  begin
-  redirect "/" + (settings.default_dashboard || first_dashboard).to_s
-  rescue NoMethodError => e
-    raise Exception.new("There are no dashboards in your dashboard directory.")
-  end
-end
-
 get '/:dashboard' do
   protected!
   tilt_html_engines.each do |suffix, _|
@@ -72,14 +82,6 @@ get '/:dashboard' do
   end
 
   halt 404
-end
-
-get '/views/:widget?.html' do
-  protected!
-  tilt_html_engines.each do |suffix, engines|
-    file = File.join(settings.root, "widgets", params[:widget], "#{params[:widget]}.#{suffix}")
-    return engines.first.new(file).render if File.exist? file
-  end
 end
 
 post '/dashboards/:id' do
@@ -109,16 +111,12 @@ post '/widgets/:id' do
   end
 end
 
-not_found do
-  send_file File.join(settings.public_folder, '404.html')
-end
-
-def development?
-  ENV['RACK_ENV'] == 'development'
-end
-
-def production?
-  ENV['RACK_ENV'] == 'production'
+get '/views/:widget?.html' do
+  protected!
+  tilt_html_engines.each do |suffix, engines|
+    file = File.join(settings.root, "widgets", params[:widget], "#{params[:widget]}.#{suffix}")
+    return engines.first.new(file).render if File.exist? file
+  end
 end
 
 def send_event(id, body, target=nil)
@@ -154,14 +152,16 @@ def tilt_html_engines
   end
 end
 
-settings_file = File.join(settings.root, 'config/settings.rb')
-if (File.exists?(settings_file))
-  require settings_file
+def require_glob(relative_glob)
+  Dir[File.join(settings.root, relative_glob)].each do |file|
+    require file
+  end
 end
 
-Dir[File.join(settings.root, 'lib', '**', '*.rb')].each {|file| require file }
-{}.to_json # Forces your json codec to initialize (in the event that it is lazily loaded). Does this before job threads start.
+settings_file = File.join(settings.root, 'config/settings.rb')
+require settings_file if File.exists?(settings_file)
 
+{}.to_json # Forces your json codec to initialize (in the event that it is lazily loaded). Does this before job threads start.
 job_path = ENV["JOB_PATH"] || 'jobs'
-files = Dir[File.join(settings.root, job_path, '**', '/*.rb')]
-files.each { |job| require(job) }
+require_glob(File.join('lib', '**', '*.rb'))
+require_glob(File.join(job_path, '**', '*.rb'))

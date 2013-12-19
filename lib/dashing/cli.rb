@@ -10,7 +10,7 @@ module Dashing
     class << self
       attr_accessor :auth_token
 
-      def CLI.hyphenate(str)
+      def hyphenate(str)
         return str.downcase if str =~ /^[A-Z-]+$/
         str.gsub('_', '-').gsub(/\B[A-Z]/, '-\&').squeeze('-').downcase
       end
@@ -43,16 +43,7 @@ module Dashing
       gist = Downloader.get_gist(gist_id)
       public_url = "https://gist.github.com/#{gist_id}"
 
-      gist['files'].each do |file, details|
-        if file =~ /\.(html|coffee|scss)\z/
-          widget_name = File.basename(file, '.*')
-          new_path = File.join(Dir.pwd, 'widgets', widget_name, file)
-          create_file(new_path, details['content'])
-        elsif file.end_with?('.rb')
-          new_path = File.join(Dir.pwd, 'jobs', file)
-          create_file(new_path, details['content'])
-        end
-      end
+      install_widget_from_gist(gist)
 
       print set_color("Don't forget to edit the ", :yellow)
       print set_color("Gemfile ", :yellow, :bold)
@@ -96,6 +87,19 @@ module Dashing
 
     def run_command(command)
       system(command)
+    end
+
+    def install_widget_from_gist(gist)
+      gist['files'].each do |file, details|
+        if file =~ /\.(html|coffee|scss)\z/
+          widget_name = File.basename(file, '.*')
+          new_path = File.join(Dir.pwd, 'widgets', widget_name, file)
+          create_file(new_path, details['content'])
+        elsif file.end_with?('.rb')
+          new_path = File.join(Dir.pwd, 'jobs', file)
+          create_file(new_path, details['content'])
+        end
+      end
     end
 
     def require_file(file)

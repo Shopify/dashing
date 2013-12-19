@@ -4,10 +4,45 @@ require 'haml'
 class AppTest < Dashing::Test
   def setup
     @connection = []
-    Sinatra::Application.settings.history_file = File.join(Dir.tmpdir, 'history.yml')
-    Sinatra::Application.settings.connections = [@connection]
-    Sinatra::Application.settings.auth_token = nil
-    Sinatra::Application.settings.default_dashboard = nil
+    app.settings.connections = [@connection]
+    app.settings.auth_token = nil
+    app.settings.default_dashboard = nil
+    app.settings.history_file = File.join(Dir.tmpdir, 'history.yml')
+  end
+
+  def test_redirect_to_first_dashboard
+    with_generated_project do
+      get '/'
+      assert_equal 302, last_response.status
+      assert_equal 'http://example.org/sample', last_response.location
+    end
+  end
+
+  def test_redirect_to_first_dashboard_without_erb
+    with_generated_project do |dir|
+      FileUtils.touch(File.join(dir, "dashboards/htmltest.html"))
+      get '/'
+      assert_equal 302, last_response.status
+      assert_equal 'http://example.org/htmltest', last_response.location
+    end
+  end
+
+  def test_redirect_to_default_dashboard
+    with_generated_project do
+      app.settings.default_dashboard = 'test1'
+      get '/'
+      assert_equal 302, last_response.status
+      assert_equal 'http://example.org/test1', last_response.location
+    end
+  end
+
+  def test_errors_out_when_no_dashboards_available
+    with_generated_project do
+      app.settings.views = File.join(app.settings.root, 'lib')
+
+      get '/'
+      assert_equal 500, last_response.status
+    end
   end
 
   def test_post_widgets_without_auth_token
@@ -22,13 +57,13 @@ class AppTest < Dashing::Test
   end
 
   def test_post_widgets_with_invalid_auth_token
-    Sinatra::Application.settings.auth_token = 'sekrit'
+    app.settings.auth_token = 'sekrit'
     post '/widgets/some_widget', JSON.generate({value: 9})
     assert_equal 401, last_response.status
   end
 
   def test_post_widgets_with_valid_auth_token
-    Sinatra::Application.settings.auth_token = 'sekrit'
+    app.settings.auth_token = 'sekrit'
     post '/widgets/some_widget', JSON.generate({value: 9, auth_token: 'sekrit'})
     assert_equal 204, last_response.status
   end
@@ -50,32 +85,6 @@ class AppTest < Dashing::Test
     assert_equal 200, last_response.status
     assert_equal 'dashboards', parse_event(@connection[0])
     assert_equal 'reload', parse_data(@connection[0])['event']
-  end
-
-  def test_redirect_to_default_dashboard
-    with_generated_project do
-      Sinatra::Application.settings.default_dashboard = 'test1'
-      get '/'
-      assert_equal 302, last_response.status
-      assert_equal 'http://example.org/test1', last_response.location
-    end
-  end
-
-  def test_redirect_to_first_dashboard
-    with_generated_project do
-      get '/'
-      assert_equal 302, last_response.status
-      assert_equal 'http://example.org/sample', last_response.location
-    end
-  end
-
-  def test_redirect_to_first_dashboard_without_erb
-    with_generated_project do |dir|
-      FileUtils.touch(File.join(dir, "dashboards/htmltest.html"))
-      get '/'
-      assert_equal 302, last_response.status
-      assert_equal 'http://example.org/htmltest', last_response.location
-    end
   end
 
   def test_get_dashboard
@@ -129,14 +138,16 @@ class AppTest < Dashing::Test
   end
 
   def with_generated_project
+    source_path = File.expand_path('../../templates', __FILE__)
+
     temp do |dir|
       cli = Dashing::CLI.new
-      cli.stubs(:source_paths).returns([File.expand_path('../../templates', __FILE__)])
+      cli.stubs(:source_paths).returns([source_path])
       silent { cli.new 'new_project' }
 
-      Sinatra::Application.settings.views = File.join(dir, 'new_project/dashboards')
-      Sinatra::Application.settings.root = File.join(dir, 'new_project')
-      yield Sinatra::Application.settings.root
+      app.settings.views = File.join(dir, 'new_project/dashboards')
+      app.settings.root = File.join(dir, 'new_project')
+      yield app.settings.root
     end
   end
 

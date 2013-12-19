@@ -4,4 +4,5 @@ bin_file = Pathname.new(__FILE__).realpath
 $:.unshift File.expand_path("../../lib", bin_file)
 
 require 'dashing'
+Dashing::CLI.source_root(File.expand_path('../../templates', bin_file))
 Dashing::CLI.start(ARGV)
