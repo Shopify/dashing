@@ -44,7 +44,7 @@ end
   settings.sprockets.append_path("assets/#{path}")
 end
 
-['widgets', File.expand_path('../../javascripts', __FILE__)]. each do |path|
+['widgets', File.expand_path('../../../javascripts', __FILE__)]. each do |path|
   settings.sprockets.append_path(path)
 end
 
