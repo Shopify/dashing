@@ -1,3 +1,5 @@
 *DS_STORE
 /Gemfile.lock
 *.gem
+coverage/
+.ruby-version
