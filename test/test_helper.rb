@@ -1,19 +1,28 @@
+require 'simplecov'
+SimpleCov.start do
+  add_filter "/vendor/"
+  add_filter "/test/"
+end
+
 require 'rack/test'
 require 'stringio'
-require 'test/unit'
 require 'tmpdir'
+require 'fakeweb'
+require 'minitest/autorun'
+require 'minitest/pride'
+require 'mocha/setup'
+
+require_relative '../lib/dashing'
+
+FakeWeb.allow_net_connect = false
 
 ENV['RACK_ENV'] = 'test'
 WORKING_DIRECTORY = Dir.pwd.freeze
 ARGV.clear
 
-def silent
-  _stdout = $stdout
-  $stdout = mock = StringIO.new
-  begin
-    yield
-  ensure
-    $stdout = _stdout
+def load_quietly(file)
+  Minitest::Test.new(nil).capture_io do
+    load file
   end
 end
 
@@ -28,7 +37,13 @@ ensure
 end
 
 module Dashing
-  class Test < Test::Unit::TestCase
+  class Test < Minitest::Test
     include Rack::Test::Methods
+
+    alias_method :silent, :capture_io
+
+    def teardown
+      FileUtils.rm_f('history.yml')
+    end
   end
 end

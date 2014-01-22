@@ -11,7 +11,7 @@ Batman.Filters.dashize = (str) ->
   dashes_rx1 = /([A-Z]+)([A-Z][a-z])/g;
   dashes_rx2 = /([a-z\d])([A-Z])/g;
 
-  return str.replace(dashes_rx1, '$1_$2').replace(dashes_rx2, '$1_$2').replace('_', '-').toLowerCase()
+  return str.replace(dashes_rx1, '$1_$2').replace(dashes_rx2, '$1_$2').replace(/_/g, '-').toLowerCase()
 
 Batman.Filters.shortenedNumber = (num) ->
   return num if isNaN(num)
@@ -25,6 +25,9 @@ Batman.Filters.shortenedNumber = (num) ->
     num
 
 class window.Dashing extends Batman.App
+  @on 'reload', (data) ->
+    window.location.reload(true)
+
   @root ->
 Dashing.params = Batman.URI.paramsFromQuery(window.location.search.slice(1));
 
@@ -89,16 +92,19 @@ Dashing.widgets = widgets = {}
 Dashing.lastEvents = lastEvents = {}
 Dashing.debugMode = false
 
-source = new EventSource('/events')
+source = new EventSource('events')
 source.addEventListener 'open', (e) ->
-  console.log("Connection opened")
+  console.log("Connection opened", e)
 
 source.addEventListener 'error', (e)->
-  console.log("Connection error")
-  if (e.readyState == EventSource.CLOSED)
+  console.log("Connection error", e)
+  if (e.currentTarget.readyState == EventSource.CLOSED)
     console.log("Connection closed")
+    setTimeout (->
+      window.location.reload()
+    ), 5*60*1000
 
-source.addEventListener 'message', (e) =>
+source.addEventListener 'message', (e) ->
   data = JSON.parse(e.data)
   if lastEvents[data.id]?.updatedAt != data.updatedAt
     if Dashing.debugMode
@@ -108,6 +114,12 @@ source.addEventListener 'message', (e) =>
       for widget in widgets[data.id]
         widget.receiveData(data)
 
+source.addEventListener 'dashboards', (e) ->
+  data = JSON.parse(e.data)
+  if Dashing.debugMode
+    console.log("Received data for dashboards", data)
+  if data.dashboard is '*' or window.location.pathname is "/#{data.dashboard}"
+    Dashing.fire data.event, data
 
 $(document).ready ->
   Dashing.run()
