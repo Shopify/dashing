@@ -109,11 +109,12 @@ get '/views/:widget?.html' do
   end
 end
 
-get '/:dashboard' do
+get '/*' do
+  dashboard = File.join(params[:splat])
   protected!
   tilt_html_engines.each do |suffix, _|
-    file = File.join(settings.views, "#{params[:dashboard]}.#{suffix}")
-    return render(suffix.to_sym, params[:dashboard].to_sym) if File.exist? file
+    file = File.join(settings.views, "#{dashboard}.#{suffix}")
+    return render(suffix.to_sym, dashboard.to_sym) if File.exist? file
   end
 
   halt 404
