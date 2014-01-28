@@ -67,8 +67,19 @@ end
 get '/events', provides: 'text/event-stream' do
   protected!
   response.headers['X-Accel-Buffering'] = 'no' # Disable buffering for nginx
+  response.headers['Access-Control-Allow-Origin'] = '*' # For Yaffle eventsource polyfill
+  response.headers['Cache-Control'] = 'no-cache' # For Yaffle eventsource polyfill
+  
   stream :keep_open do |out|
     settings.connections << out
+  
+    # For Yaffle eventsource polyfill
+    #Add 2k padding for IE
+    str = ":".ljust(2049) << "\n"
+    #add retry key
+    str << "retry: 2000\n"
+    out << str
+    
     out << latest_events
     out.callback { settings.connections.delete(out) }
   end
