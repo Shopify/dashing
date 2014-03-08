@@ -41,14 +41,14 @@
             "metadata": {}
         },
         {
-            "data": 5,
+            "data": 25,
             "tgt": {
                 "process": "math/Multiply_9jejf",
                 "port": "multiplicand"
             }
         },
         {
-            "data": 4,
+            "data": 24,
             "tgt": {
                 "process": "math/Multiply_9jejf",
                 "port": "multiplier"
