@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name        = 'dashing'
-  s.version     = '1.3.2'
+  s.version     = '1.3.x'
   s.date        = '2013-11-21'
   s.executables << 'dashing'
 

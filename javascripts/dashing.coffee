@@ -94,7 +94,8 @@ Dashing.debugMode = false
 
 source = new EventSource('events')
 source.addEventListener 'open', (e) ->
-  console.log("Connection opened", e)
+  if Dashing.debugMode
+    console.log("Connection opened", e)
 
 source.addEventListener 'error', (e)->
   console.log("Connection error", e)
