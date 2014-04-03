@@ -45,7 +45,7 @@ if redis?
                           :port => redis_uri.port,
                           :password => redis_uri.password)
 
-  set :history, Redis::HashKey.new('dashing-history')
+  set :history, Redis::HashKey.new('dashing-history', :marshal => true)
 elsif File.exists?(settings.history_file)
   set history: YAML.load_file(settings.history_file)
 else
