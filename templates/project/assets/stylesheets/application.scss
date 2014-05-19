@@ -143,9 +143,9 @@ h3 {
 }
 
 .widget {
-  padding: 25px 12px;
   text-align: center;
-  width: 100%;
+  width: inherit;
+  height: inherit;
   display: table-cell;
   vertical-align: middle;
 }
