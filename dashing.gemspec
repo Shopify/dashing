@@ -4,7 +4,7 @@ Gem::Specification.new do |s|
   s.name        = 'dashing'
   s.version     = '1.3.3'
   s.date        = '2013-11-21'
-  s.executables << 'dashing'
+  s.executables = %w(dashing)
 
 
   s.summary     = "The exceptionally handsome dashboard framework."
