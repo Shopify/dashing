@@ -92,7 +92,7 @@ Dashing.widgets = widgets = {}
 Dashing.lastEvents = lastEvents = {}
 Dashing.debugMode = false
 
-source = new EventSource('events')
+source = new EventSource('/events')
 source.addEventListener 'open', (e) ->
   console.log("Connection opened", e)
 

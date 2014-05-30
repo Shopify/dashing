@@ -74,16 +74,6 @@ get '/events', provides: 'text/event-stream' do
   end
 end
 
-get '/:dashboard' do
-  protected!
-  tilt_html_engines.each do |suffix, _|
-    file = File.join(settings.views, "#{params[:dashboard]}.#{suffix}")
-    return render(suffix.to_sym, params[:dashboard].to_sym) if File.exist? file
-  end
-
-  halt 404
-end
-
 post '/dashboards/:id' do
   request.body.rewind
   body = JSON.parse(request.body.read)
@@ -117,6 +107,17 @@ get '/views/:widget?.html' do
     file = File.join(settings.root, "widgets", params[:widget], "#{params[:widget]}.#{suffix}")
     return engines.first.new(file).render if File.exist? file
   end
+end
+
+get '/*' do
+  dashboard = File.join(params[:splat])
+  protected!
+  tilt_html_engines.each do |suffix, _|
+    file = File.join(settings.views, "#{dashboard}.#{suffix}")
+    return render(suffix.to_sym, dashboard.to_sym) if File.exist? file
+  end
+
+  halt 404
 end
 
 def send_event(id, body, target=nil)

@@ -103,6 +103,16 @@ class AppTest < Dashing::Test
     end
   end
 
+  def test_get_dashboard_in_subdir
+    with_generated_project do
+      get '/subdir/sample'
+      assert_equal 200, last_response.status
+      assert_includes last_response.body, 'class="gridster"'
+      assert_includes last_response.body, "DOCTYPE"
+      assert_includes last_response.body, '<title>Subdirectory dashboard</title>'
+    end
+  end
+
   def test_get_haml_dashboard
     with_generated_project do |dir|
       File.write(File.join(dir, 'dashboards/hamltest.haml'), '.gridster')
