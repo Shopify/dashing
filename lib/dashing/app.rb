@@ -6,6 +6,7 @@ require 'coffee-script'
 require 'sass'
 require 'json'
 require 'yaml'
+require 'redis-objects'
 
 SCHEDULER = Rufus::Scheduler.new
 
@@ -15,6 +16,10 @@ end
 
 def production?
   ENV['RACK_ENV'] == 'production'
+end
+
+def redis?
+  ENV.has_key? 'REDISTOGO_URL'
 end
 
 helpers Sinatra::ContentFor
@@ -34,7 +39,14 @@ set :views, File.join(settings.root, 'dashboards')
 set :default_dashboard, nil
 set :auth_token, nil
 
-if File.exists?(settings.history_file)
+if redis?
+  redis_uri = URI.parse(ENV['REDISTOGO_URL'])
+  Redis.current = Redis.new(:host => redis_uri.host,
+                          :port => redis_uri.port,
+                          :password => redis_uri.password)
+
+  set :history, Redis::HashKey.new('dashing-history', :marshal => true)
+elsif File.exists?(settings.history_file)
   set history: YAML.load_file(settings.history_file)
 else
   set history: {}

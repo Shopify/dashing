@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
   s.add_dependency('thor', '~> 0.18.1')
   s.add_dependency('sprockets', '~> 2.10.1')
   s.add_dependency('rack', '~> 1.5.2')
+  s.add_dependency('redis-objects', '~> 0.9.0')
 
   s.add_development_dependency('rake', '~> 10.1.0')
   s.add_development_dependency('haml', '~> 4.0.4')
