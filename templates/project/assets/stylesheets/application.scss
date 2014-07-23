@@ -117,6 +117,7 @@ h3 {
 }
 
 .icon-background {
+  pointer-events: none;
   width: 100%!important;
   height: 100%;
   position: absolute;
