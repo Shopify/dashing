@@ -109,8 +109,8 @@ source.addEventListener 'message', (e) ->
   if lastEvents[data.id]?.updatedAt != data.updatedAt
     if Dashing.debugMode
       console.log("Received data for #{data.id}", data)
-    lastEvents[data.id] = data
     if widgets[data.id]?.length > 0
+      lastEvents[data.id] = data
       for widget in widgets[data.id]
         widget.receiveData(data)
 
