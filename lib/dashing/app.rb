@@ -10,6 +10,11 @@ require 'thin'
 
 SCHEDULER = Rufus::Scheduler.new
 
+# Eventsource shim keep-alive
+SCHEDULER.every '15s', :first_in => 0 do |job|
+  settings.connections.each { |out| out << ': ' }
+end
+
 def development?
   ENV['RACK_ENV'] == 'development'
 end
@@ -65,11 +70,15 @@ get '/' do
   redirect "/" + dashboard
 end
 
+# Required initial padding for some browsers (4k)
+PADDING = (":"+" "*4095)
+
 get '/events', provides: 'text/event-stream' do
   protected!
   response.headers['X-Accel-Buffering'] = 'no' # Disable buffering for nginx
   stream :keep_open do |out|
     settings.connections << out
+    out << PADDING
     out << latest_events
     out.callback { settings.connections.delete(out) }
   end

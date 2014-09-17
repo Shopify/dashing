@@ -92,13 +92,16 @@ Dashing.widgets = widgets = {}
 Dashing.lastEvents = lastEvents = {}
 Dashing.debugMode = false
 
+$(window).load ->
+  Dashing.run()
+
 source = new EventSource('events')
 source.addEventListener 'open', (e) ->
   console.log("Connection opened", e)
 
 source.addEventListener 'error', (e)->
   console.log("Connection error", e)
-  if (e.currentTarget.readyState == EventSource.CLOSED)
+    if (e.target.readyState == EventSource.CLOSED)
     console.log("Connection closed")
     setTimeout (->
       window.location.reload()
@@ -121,5 +124,3 @@ source.addEventListener 'dashboards', (e) ->
   if data.dashboard is '*' or window.location.pathname is "/#{data.dashboard}"
     Dashing.fire data.event, data
 
-$(document).ready ->
-  Dashing.run()
