@@ -2,6 +2,7 @@
 #= require es5-shim
 #= require batman
 #= require batman.jquery
+#= require configuration
 
 
 Batman.Filters.prettyNumber = (num) ->
@@ -122,4 +123,5 @@ source.addEventListener 'dashboards', (e) ->
     Dashing.fire data.event, data
 
 $(document).ready ->
+  Dashing.source=source
   Dashing.run()

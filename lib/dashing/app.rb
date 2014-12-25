@@ -25,6 +25,9 @@ helpers do
   end
 end
 
+
+
+
 set :root, Dir.pwd
 set :sprockets,     Sprockets::Environment.new(settings.root)
 set :assets_prefix, '/assets'
@@ -34,12 +37,15 @@ set :public_folder, File.join(settings.root, 'public')
 set :views, File.join(settings.root, 'dashboards')
 set :default_dashboard, nil
 set :auth_token, nil
+set :eventsengine, "SSE"
+
 
 if File.exists?(settings.history_file)
   set history: YAML.load_file(settings.history_file)
 else
   set history: {}
 end
+
 
 %w(javascripts stylesheets fonts images).each do |path|
   settings.sprockets.append_path("assets/#{path}")
@@ -171,6 +177,9 @@ end
 
 settings_file = File.join(settings.root, 'config/settings.rb')
 require settings_file if File.exists?(settings_file)
+
+
+
 
 {}.to_json # Forces your json codec to initialize (in the event that it is lazily loaded). Does this before job threads start.
 job_path = ENV["JOB_PATH"] || 'jobs'
