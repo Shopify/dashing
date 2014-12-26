@@ -5,6 +5,7 @@
 #= require configuration
 
 
+
 Batman.Filters.prettyNumber = (num) ->
   num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") unless isNaN(num)
 
@@ -29,8 +30,16 @@ class window.Dashing extends Batman.App
   @on 'reload', (data) ->
     window.location.reload(true)
 
+  @on 'ready', (data) ->
+    @source.subscribe(@widgets)
+
   @root ->
+
+
 Dashing.params = Batman.URI.paramsFromQuery(window.location.search.slice(1));
+
+
+
 
 class Dashing.Widget extends Batman.View
   constructor:  ->
@@ -93,35 +102,69 @@ Dashing.widgets = widgets = {}
 Dashing.lastEvents = lastEvents = {}
 Dashing.debugMode = false
 
-source = new EventSource('events')
-source.addEventListener 'open', (e) ->
-  console.log("Connection opened", e)
 
-source.addEventListener 'error', (e)->
-  console.log("Connection error", e)
-  if (e.currentTarget.readyState == EventSource.CLOSED)
-    console.log("Connection closed")
-    setTimeout (->
-      window.location.reload()
-    ), 5*60*1000
+createEventsSource = -> 
+  source=null
+  switch Configuration.EventEngine 
+    when "SSE"
+      source = new EventSource(Configuration.SSEUrl)
+      source.addEventListener 'open', (e) ->
+        console.log("Connection opened", e)
 
-source.addEventListener 'message', (e) ->
-  data = JSON.parse(e.data)
-  if lastEvents[data.id]?.updatedAt != data.updatedAt
-    if Dashing.debugMode
-      console.log("Received data for #{data.id}", data)
-    if widgets[data.id]?.length > 0
-      lastEvents[data.id] = data
-      for widget in widgets[data.id]
-        widget.receiveData(data)
+      source.addEventListener 'error', (e)->
+        console.log("Connection error", e)
+        if (e.currentTarget.readyState == EventSource.CLOSED)
+          console.log("Connection closed")
+          setTimeout (->
+            window.location.reload()
+          ), 5*60*1000
 
-source.addEventListener 'dashboards', (e) ->
-  data = JSON.parse(e.data)
-  if Dashing.debugMode
-    console.log("Received data for dashboards", data)
-  if data.dashboard is '*' or window.location.pathname is "/#{data.dashboard}"
-    Dashing.fire data.event, data
+      source.addEventListener 'message', (e) ->
+        data = JSON.parse(e.data)
+        if lastEvents[data.id]?.updatedAt != data.updatedAt
+          if Dashing.debugMode
+            console.log("Received data for #{data.id}", data)
+          if widgets[data.id]?.length > 0
+            lastEvents[data.id] = data
+            for widget in widgets[data.id]
+              widget.receiveData(data)
+
+      source.addEventListener 'dashboards', (e) ->
+        data = JSON.parse(e.data)
+        if Dashing.debugMode
+          console.log("Received data for dashboards", data)
+        if data.dashboard is '*' or window.location.pathname is "/#{data.dashboard}"
+          Dashing.fire data.event, data
+      source.subscribe = (widgets) ->
+        console.log("widgets")
+        console.log(widgets)
+        msg = {type: 'subscribe',data: widgets.keys()}
+
+
+    when "WS"
+      source = new WebSocket(Configuration.WSUrl)
+      source.onopen = (evt) -> 
+        console.log("ws opened")
+      source.onclose = (evt) -> 
+        console.log("ws closed");
+      source.onmessage = (evt) -> 
+        console.log("ws message:"+evt)
+      source.onerror = (evt) -> 
+        if (evt.currentTarget.readyState == WebSocket.CLOSED)
+          console.log("WS Connection closed")
+          setTimeout (->
+            window.location.reload()
+          ), 5*60*1000
+      source.subscribe = (widgets) ->
+        msg = {type: 'subscribe',data: {events: widgets.keys()}}
+        @send(msg)
+    
+
+  source
+
+
 
 $(document).ready ->
-  Dashing.source=source
+  Dashing.source=createEventsSource()
   Dashing.run()
+

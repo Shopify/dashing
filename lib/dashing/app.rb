@@ -7,6 +7,7 @@ require 'sass'
 require 'json'
 require 'yaml'
 require 'thin'
+require 'dashing/constants'
 
 SCHEDULER = Rufus::Scheduler.new
 
@@ -37,7 +38,7 @@ set :public_folder, File.join(settings.root, 'public')
 set :views, File.join(settings.root, 'dashboards')
 set :default_dashboard, nil
 set :auth_token, nil
-set :eventsengine, "SSE"
+set :eventsengine, EventsEngines::SSE
 
 
 if File.exists?(settings.history_file)
@@ -139,6 +140,7 @@ end
 def send_event(id, body, target=nil)
   body[:id] = id
   body[:updatedAt] ||= Time.now.to_i
+  body=store_event(body)
   event = format_event(body.to_json, target)
   Sinatra::Application.settings.history[id] = event unless target == 'dashboards'
   Sinatra::Application.settings.connections.each { |out| out << event }
@@ -146,8 +148,13 @@ end
 
 def format_event(body, name=nil)
   str = ""
-  str << "event: #{name}\n" if name
-  str << "data: #{body}\n\n"
+  case Sinatra::Application.settings.eventsengine
+  when EventsEngines::SSE
+    str << "event: #{name}\n" if name
+    str << "data: #{body}\n\n"
+  when EventsEngines::WS
+    str << {type: 'event',data: body }.to_json
+  str
 end
 
 def latest_events
@@ -173,6 +180,17 @@ def require_glob(relative_glob)
   Dir[File.join(settings.root, relative_glob)].each do |file|
     require file
   end
+end
+
+def store_event(body)
+  id=body[:id]
+  if not Sinatra::Application.settings.history_json[id].nil? then
+    Sinatra::Application.settings.history_json[id].merge!(body)
+    body=Sinatra::Application.settings.history_json[id]
+  else
+    Sinatra::Application.settings.history_json[id]=body unless target == 'dashboards'
+  end
+  body
 end
 
 settings_file = File.join(settings.root, 'config/settings.rb')
