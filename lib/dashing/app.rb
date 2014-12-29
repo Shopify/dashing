@@ -8,6 +8,8 @@ require 'json'
 require 'yaml'
 require 'thin'
 require 'dashing/constants'
+require 'dashing/serversentevents'
+require 'dashing/websockets'
 
 SCHEDULER = Rufus::Scheduler.new
 
@@ -38,7 +40,7 @@ set :public_folder, File.join(settings.root, 'public')
 set :views, File.join(settings.root, 'dashboards')
 set :default_dashboard, nil
 set :auth_token, nil
-set :eventsengine, EventsEngines::SSE
+set :eventsengine, nil
 
 
 if File.exists?(settings.history_file)
@@ -72,15 +74,7 @@ get '/' do
   redirect "/" + dashboard
 end
 
-get '/events', provides: 'text/event-stream' do
-  protected!
-  response.headers['X-Accel-Buffering'] = 'no' # Disable buffering for nginx
-  stream :keep_open do |out|
-    settings.connections << out
-    out << latest_events
-    out.callback { settings.connections.delete(out) }
-  end
-end
+
 
 get '/:dashboard' do
   protected!
@@ -129,7 +123,7 @@ end
 
 Thin::Server.class_eval do
   def stop_with_connection_closing
-    Sinatra::Application.settings.connections.dup.each(&:close)
+    Sinatra::Application.settings.eventsengine.stop
     stop_without_connection_closing
   end
 
@@ -140,28 +134,12 @@ end
 def send_event(id, body, target=nil)
   body[:id] = id
   body[:updatedAt] ||= Time.now.to_i
-  body=store_event(body)
-  event = format_event(body.to_json, target)
-  Sinatra::Application.settings.history[id] = event unless target == 'dashboards'
-  Sinatra::Application.settings.connections.each { |out| out << event }
+  Sinatra::Application.settings.eventsengine.send_event(id,body,target)
 end
 
-def format_event(body, name=nil)
-  str = ""
-  case Sinatra::Application.settings.eventsengine
-  when EventsEngines::SSE
-    str << "event: #{name}\n" if name
-    str << "data: #{body}\n\n"
-  when EventsEngines::WS
-    str << {type: 'event',data: body }.to_json
-  str
-end
 
-def latest_events
-  settings.history.inject("") do |str, (id, body)|
-    str << body
-  end
-end
+
+
 
 def first_dashboard
   files = Dir[File.join(settings.views, '*')].collect { |f| File.basename(f, '.*') }
@@ -182,24 +160,16 @@ def require_glob(relative_glob)
   end
 end
 
-def store_event(body)
-  id=body[:id]
-  if not Sinatra::Application.settings.history_json[id].nil? then
-    Sinatra::Application.settings.history_json[id].merge!(body)
-    body=Sinatra::Application.settings.history_json[id]
-  else
-    Sinatra::Application.settings.history_json[id]=body unless target == 'dashboards'
-  end
-  body
-end
+
 
 settings_file = File.join(settings.root, 'config/settings.rb')
 require settings_file if File.exists?(settings_file)
 
 
 
-
+=begin
 {}.to_json # Forces your json codec to initialize (in the event that it is lazily loaded). Does this before job threads start.
 job_path = ENV["JOB_PATH"] || 'jobs'
 require_glob(File.join('lib', '**', '*.rb'))
 require_glob(File.join(job_path, '**', '*.rb'))
+=end

@@ -144,11 +144,34 @@ createEventsSource = ->
     when "WS"
       source = new WebSocket(Configuration.WSUrl)
       source.onopen = (evt) -> 
-        console.log("ws opened")
+        if Dashing.debugMode
+          console.log("ws opened")
+          console.log(evt)
       source.onclose = (evt) -> 
-        console.log("ws closed");
+        if Dashing.debugMode
+          console.log("ws closed");
+          console.log(evt)
       source.onmessage = (evt) -> 
-        console.log("ws message:"+evt)
+        if Dashing.debugMode
+          console.log("ws message:")
+          console.log(evt)
+        msgdata=JSON.parse(evt.data)
+        switch msgdata.type
+          when 'event'
+            for data in msgdata.data
+              if lastEvents[data.id]?.updatedAt != data.updatedAt
+                if Dashing.debugMode
+                  console.log("Received data for #{data.id}", data)
+                if widgets[data.id]?.length > 0
+                  lastEvents[data.id] = data
+                  for widget in widgets[data.id]
+                    widget.receiveData(data)
+          when 'dashboards'
+            data=msgdata.data
+            if Dashing.debugMode
+              console.log("Received data for dashboards", data)
+            if data.dashboard is '*' or window.location.pathname is "/#{data.dashboard}"
+              Dashing.fire data.event, data
       source.onerror = (evt) -> 
         if (evt.currentTarget.readyState == WebSocket.CLOSED)
           console.log("WS Connection closed")
@@ -156,8 +179,9 @@ createEventsSource = ->
             window.location.reload()
           ), 5*60*1000
       source.subscribe = (widgets) ->
-        msg = {type: 'subscribe',data: {events: widgets.keys()}}
-        @send(msg)
+        msg = {type: 'subscribe',data: {events: Object.keys(widgets)}}
+        jmsg=JSON.stringify(msg)       
+        @send(jmsg)
     
 
   source
