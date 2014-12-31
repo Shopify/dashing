@@ -38,7 +38,7 @@ class ServerSentEvents < EventsEngine
 				str << format_event(body.to_json)
 			end
     	out << latest_events
-    	out.callback { @connections.delete(out) }
+    	out.callback { onclose(conn) }
 	end	
 	def format_event(body, name=nil)
 	  str = ""

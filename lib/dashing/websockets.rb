@@ -22,7 +22,7 @@ get '/websocket/connection' do
 					when 'subscribe'
 						settings.eventsengine.openConnection(ws,message)
 					when 'event'
-						logger.warn("events from a client are not supported")
+						logger.warn("events from clients are not supported")
 					end
 			rescue Exception => e
 				logger.warn(e.message)
@@ -30,7 +30,7 @@ get '/websocket/connection' do
 			end 
 		end
 		ws.onclose do
-			warn("websocket closed")
+			logger.warn("websocket closed")
 			settings.eventsengine.onclose(ws)
 		end
 	end
@@ -58,10 +58,11 @@ class WebSocketEvents < ServerSentEvents
 	end
 	def send(body,target=nil)
 		if target=='dashboards'
-			print "#{body}:#{target}\n"
-			print "#{@connections.to_json}\n"
 			@connections.each { |ws| ws.send(format_event(body,target)) }
 		end
 		@subscription[body[:id]].each { |out| out.send(format_event(body)) } unless @subscription[body[:id]].nil?
 	end
+	def onclose(socket)
+		super.onclose(socket)
+		@subscription.each {|id,connlist| connlist.delete(socket) }
 end
