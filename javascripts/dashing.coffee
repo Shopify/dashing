@@ -102,47 +102,55 @@ Dashing.widgets = widgets = {}
 Dashing.lastEvents = lastEvents = {}
 Dashing.debugMode = false
 
+class DashingEvents
+  message: (data) ->
+   if lastEvents[data.id]?.updatedAt != data.updatedAt
+    if Dashing.debugMode
+      console.log("Received data for #{data.id}", data)
+    if widgets[data.id]?.length > 0
+      lastEvents[data.id] = data
+      for widget in widgets[data.id]
+        widget.receiveData(data)
+  dashboards: (data) ->
+    if Dashing.debugMode
+      console.log("Received data for dashboards", data)
+    if data.dashboard is '*' or window.location.pathname is "/#{data.dashboard}"
+      Dashing.fire data.event, data
+  onerror: (err) ->
+    setTimeout (->
+      window.location.reload()
+    ), 5*60*1000
+
 
 createEventsSource = -> 
   source=null
   switch Configuration.EventEngine 
     when "SSE"
       source = new EventSource(Configuration.SSEUrl)
+      source.sender=new DashingEvents
       source.addEventListener 'open', (e) ->
         console.log("Connection opened", e)
 
       source.addEventListener 'error', (e)->
         console.log("Connection error", e)
         if (e.currentTarget.readyState == EventSource.CLOSED)
-          console.log("Connection closed")
-          setTimeout (->
-            window.location.reload()
-          ), 5*60*1000
+          @sender.onerror(e)
 
       source.addEventListener 'message', (e) ->
         data = JSON.parse(e.data)
-        if lastEvents[data.id]?.updatedAt != data.updatedAt
-          if Dashing.debugMode
-            console.log("Received data for #{data.id}", data)
-          if widgets[data.id]?.length > 0
-            lastEvents[data.id] = data
-            for widget in widgets[data.id]
-              widget.receiveData(data)
+        @sender.message(data)
 
       source.addEventListener 'dashboards', (e) ->
         data = JSON.parse(e.data)
-        if Dashing.debugMode
-          console.log("Received data for dashboards", data)
-        if data.dashboard is '*' or window.location.pathname is "/#{data.dashboard}"
-          Dashing.fire data.event, data
+        @sender.dashboards(data)
+
       source.subscribe = (widgets) ->
         console.log("widgets")
-        console.log(widgets)
-        msg = {type: 'subscribe',data: widgets.keys()}
 
 
     when "WS"
       source = new WebSocket(Configuration.WSUrl)
+      source.sender=new DashingEvents
       source.onopen = (evt) -> 
         if Dashing.debugMode
           console.log("ws opened")
@@ -159,25 +167,12 @@ createEventsSource = ->
         switch msgdata.type
           when 'event'
             for data in msgdata.data
-              if lastEvents[data.id]?.updatedAt != data.updatedAt
-                if Dashing.debugMode
-                  console.log("Received data for #{data.id}", data)
-                if widgets[data.id]?.length > 0
-                  lastEvents[data.id] = data
-                  for widget in widgets[data.id]
-                    widget.receiveData(data)
+              @sender.message(data)
           when 'dashboards'
-            data=msgdata.data
-            if Dashing.debugMode
-              console.log("Received data for dashboards", data)
-            if data.dashboard is '*' or window.location.pathname is "/#{data.dashboard}"
-              Dashing.fire data.event, data
+            @sender.dashboards(msgdata.data)
       source.onerror = (evt) -> 
         if (evt.currentTarget.readyState == WebSocket.CLOSED)
-          console.log("WS Connection closed")
-          setTimeout (->
-            window.location.reload()
-          ), 5*60*1000
+          @sender.onerror(e)
       source.subscribe = (widgets) ->
         msg = {type: 'subscribe',data: {events: Object.keys(widgets)}}
         jmsg=JSON.stringify(msg)       

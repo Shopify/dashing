@@ -23,6 +23,12 @@ class EventsEngine
   def self.register_engine name
     @@subclasses[name] = self
   end
+  def send_event(body,target=nil)
+  	raise "EventsEngine is abstract. send_event is not implemented."
+  end
+  def stop
+  	raise "EventsEngine is abstract. stop is not implemented."
+  end
 end
 
 class ServerSentEvents < EventsEngine

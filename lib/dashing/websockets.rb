@@ -65,4 +65,5 @@ class WebSocketEvents < ServerSentEvents
 	def onclose(socket)
 		super.onclose(socket)
 		@subscription.each {|id,connlist| connlist.delete(socket) }
+	end
 end
