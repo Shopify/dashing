@@ -7,6 +7,9 @@ require 'sass'
 require 'json'
 require 'yaml'
 require 'thin'
+require 'dashing/constants'
+require 'dashing/serversentevents'
+require 'dashing/websockets'
 
 SCHEDULER = Rufus::Scheduler.new
 
@@ -25,6 +28,9 @@ helpers do
   end
 end
 
+
+
+
 set :root, Dir.pwd
 set :sprockets,     Sprockets::Environment.new(settings.root)
 set :assets_prefix, '/assets'
@@ -34,12 +40,15 @@ set :public_folder, File.join(settings.root, 'public')
 set :views, File.join(settings.root, 'dashboards')
 set :default_dashboard, nil
 set :auth_token, nil
+set :eventsengine, nil
+
 
 if File.exists?(settings.history_file)
   set history: YAML.load_file(settings.history_file)
 else
   set history: {}
 end
+
 
 %w(javascripts stylesheets fonts images).each do |path|
   settings.sprockets.append_path("assets/#{path}")
@@ -65,15 +74,7 @@ get '/' do
   redirect "/" + dashboard
 end
 
-get '/events', provides: 'text/event-stream' do
-  protected!
-  response.headers['X-Accel-Buffering'] = 'no' # Disable buffering for nginx
-  stream :keep_open do |out|
-    settings.connections << out
-    out << latest_events
-    out.callback { settings.connections.delete(out) }
-  end
-end
+
 
 get '/:dashboard' do
   protected!
@@ -122,7 +123,7 @@ end
 
 Thin::Server.class_eval do
   def stop_with_connection_closing
-    Sinatra::Application.settings.connections.dup.each(&:close)
+    Sinatra::Application.settings.eventsengine.stop
     stop_without_connection_closing
   end
 
@@ -133,22 +134,12 @@ end
 def send_event(id, body, target=nil)
   body[:id] = id
   body[:updatedAt] ||= Time.now.to_i
-  event = format_event(body.to_json, target)
-  Sinatra::Application.settings.history[id] = event unless target == 'dashboards'
-  Sinatra::Application.settings.connections.each { |out| out << event }
+  Sinatra::Application.settings.eventsengine.send_event(id,body,target)
 end
 
-def format_event(body, name=nil)
-  str = ""
-  str << "event: #{name}\n" if name
-  str << "data: #{body}\n\n"
-end
 
-def latest_events
-  settings.history.inject("") do |str, (id, body)|
-    str << body
-  end
-end
+
+
 
 def first_dashboard
   files = Dir[File.join(settings.views, '*')].collect { |f| File.basename(f, '.*') }
@@ -169,10 +160,16 @@ def require_glob(relative_glob)
   end
 end
 
+
+
 settings_file = File.join(settings.root, 'config/settings.rb')
 require settings_file if File.exists?(settings_file)
 
+
+
+=begin
 {}.to_json # Forces your json codec to initialize (in the event that it is lazily loaded). Does this before job threads start.
 job_path = ENV["JOB_PATH"] || 'jobs'
 require_glob(File.join('lib', '**', '*.rb'))
 require_glob(File.join(job_path, '**', '*.rb'))
+=end
