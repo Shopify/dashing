@@ -42,7 +42,11 @@ class WebSocketEvents < ServerSentEvents
 		super(type)
 		@subscription={}
 	end
-	def openConnection(out,message)
+	def openConnection(out,message=nil)
+		if message.nil? then 
+			out <<  "data: incorrect subscription event"
+			return
+		end
 		@connections << out
 		message['data']['events'].each do |id| 
 			@subscription[id]=[] if @subscription[id].nil?
@@ -63,7 +67,11 @@ class WebSocketEvents < ServerSentEvents
 		@subscription[body[:id]].each { |out| out.send(format_event(body)) } unless @subscription[body[:id]].nil?
 	end
 	def onclose(socket)
-		super.onclose(socket)
+		if super.nil? then 
+			print "ERRRRRORRR Super is null\n"
+		else
+			super.onclose(socket)
+		end
 		@subscription.each {|id,connlist| connlist.delete(socket) }
 	end
 end
