@@ -69,7 +69,8 @@ class ServerSentEvents < EventsEngine
 		@connections.each { |out| out << event }
 	end
 	def stop
-		@connections.dup.each(&:close)
+		@connections.dup.each {|conn| conn.close}
+		@connections.clear()
 	end
 	def onclose(conn)
 		@connections.delete(conn)

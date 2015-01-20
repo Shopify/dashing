@@ -10,34 +10,41 @@ get '/websocket/connection' do
 	halt 400,"Accepting only websocket connections" unless request.websocket?
 	halt 400,"Websockets are disabled in server the configuration" unless settings.eventsengine.type==EventsEngineTypes::WS
 	halt 500,"Invalid server configuration" unless WS_SUPPORTED_SERVER.include? settings.server
-	request.websocket do |ws|
-		ws.onopen do
-			ws.send({type:"ack",data:{result:"ok"}}.to_json)
-			#settings.engine.websockets << ws
-		end
-		ws.onmessage do |msg|
-			begin
-				message=JSON.parse(msg)
-				case message['type']
-					when 'subscribe'
-						settings.eventsengine.openConnection(ws,message)
-					when 'event'
-						logger.warn("events from clients are not supported")
-					end
-			rescue Exception => e
-				logger.warn(e.message)
-				logger.warn(e.backtrace.inspect)
-			end 
-		end
-		ws.onclose do
-			logger.warn("websocket closed")
-			settings.eventsengine.onclose(ws)
-		end
-	end
-end		
+	WebSocketEvents.init_websocket_connection(request,logger)
+end
+
+
 
 class WebSocketEvents < ServerSentEvents
 	register_engine EventsEngineTypes::WS
+	def self.init_websocket_connection(request,logger)
+		settings=Sinatra::Application.settings
+		request.websocket do |ws|
+			ws.onopen do
+				ws.send({type:"ack",data:{result:"ok"}}.to_json)
+				#settings.engine.websockets << ws
+			end
+			ws.onmessage do |msg|
+				begin
+					message=JSON.parse(msg)
+					case message['type']
+						when 'subscribe'
+							settings.eventsengine.openConnection(ws,message)
+						when 'event'
+							logger.warn("events from clients are not supported")
+					end
+				rescue Exception => e
+					logger.warn(e.message)
+					logger.warn(e.backtrace.inspect)
+				end 
+			end
+			ws.onclose do
+				logger.warn("websocket closed")
+				settings.eventsengine.onclose(ws)
+			end
+		end	
+	end
+	
 	def initialize(type)
 		super(type)
 		@subscription={}
