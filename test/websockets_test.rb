@@ -44,9 +44,7 @@ class WebSocketEventsTest < Dashing::Test
         eventsengine.send_event('id2',{data:'data'})
         assert_equal 2,connection.length
     end
-    def test_connection
-        get "/websocket/connection",{},'HTTP_CONNECTION'=>'a,upgrade','HTTP_UPGRADE'=>'websocket'
-    end
+
     def test_init_connection
         request = mock()
         connection=[]
@@ -73,4 +71,14 @@ class WebSocketEventsTest < Dashing::Test
         connection.expects(:onmessage).yields({type:'event','data'=>{'events'=>['id']}}.to_json)
         WebSocketEvents.init_websocket_connection(request,logger)
     end
+    def test_stop_engine
+        connection=[]
+        connection.expects(:send).with(:body) do |body|
+            connection << body
+        end.at_least_once
+        connection.stubs(:close).returns(true).at_least_once
+        eventsengine.openConnection(connection,{'type'=>'event','data'=>{'events'=>['id']}})
+        eventsengine.stop()
+        assert_equal 0,eventsengine.instance_variable_get(:@connections).length
+    end      
 end
