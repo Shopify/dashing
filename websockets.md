@@ -1,3 +1,13 @@
+# Compatibility issue
+The calling job files code was moved from the gem level to the project level (__config.ru__). To make you existent jobs and lib files to be called from application one need to add the following lines of code: 
+```ruby
+{}.to_json # Forces your json codec to initialize (in the event that it is lazily loaded). Does this before job threads start.
+job_path = ENV["JOB_PATH"] || 'jobs'
+require_glob(File.join('lib', '**', '*.rb'))
+require_glob(File.join(job_path, '**', '*.rb'))
+```
+to the end of the project's __config.ru__ file 
+
 # Events Engines
 Dashing provides two engines for processing events to and from clients. __ServerSentEvents__ and __WebSockets__. The __ServerSentEvents__ engine provides one way comunication from the dashing server to a client. __WebSockets__ engine provides two way communication and supports subscriptions to reduce traffic between the server and the client. A dashboard automatically subscribes to receive message only for widgets it contains.
 

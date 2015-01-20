@@ -67,11 +67,7 @@ class WebSocketEvents < ServerSentEvents
 		@subscription[body[:id]].each { |out| out.send(format_event(body)) } unless @subscription[body[:id]].nil?
 	end
 	def onclose(socket)
-		if super.nil? then 
-			print "ERRRRRORRR Super is null\n"
-		else
-			super.onclose(socket)
-		end
+		super(socket)
 		@subscription.each {|id,connlist| connlist.delete(socket) }
 	end
 end

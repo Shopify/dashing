@@ -56,12 +56,11 @@ class ServerSentEvents < EventsEngine
 	  id=body[:id]
 	  @history_json[id].merge!(body) unless @history_json[id].nil?
 	  @history_json[id]=body if @history_json[id].nil?
-	  print "#{self}\n"
 	  body=@history_json[id]
 	end
 	def send_event(id, body, target=nil)
 	  body[:id] = id
-	  body[:updatedAt] ||= Time.now.to_i
+	  body[:updatedAt] ||= (Time.now.to_f * 1000).ceil
 	  body=store_event(body,target)
 	  send(body,target)
 	end

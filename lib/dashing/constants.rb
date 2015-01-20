@@ -1,4 +1,5 @@
 module EventsEngineTypes
 	SSE="SSE"
-	WS="WS"
+	WS="WSBI"
+	WSEXT="WS"
 end

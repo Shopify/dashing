@@ -20,6 +20,7 @@ Gem::Specification.new do |s|
   s.add_dependency('execjs', '~> 2.0.2')
   s.add_dependency('sinatra', '~> 1.4.4')
   s.add_dependency('sinatra-contrib', '~> 1.4.2')
+  s.add_dependency('sinatra-websocket','~> 0.3', '>= 0.3.1')
   s.add_dependency('thin', '~> 1.6.1')
   s.add_dependency('rufus-scheduler', '~> 2.0.24')
   s.add_dependency('thor', '~> 0.18.1')

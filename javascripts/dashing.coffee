@@ -30,8 +30,6 @@ class window.Dashing extends Batman.App
   @on 'reload', (data) ->
     window.location.reload(true)
 
-  @on 'ready', (data) ->
-    @source.subscribe(@widgets)
 
   @root ->
 
@@ -103,6 +101,9 @@ Dashing.lastEvents = lastEvents = {}
 Dashing.debugMode = false
 
 class DashingEvents
+  constructor: ->
+    @initdone=false
+
   message: (data) ->
    if lastEvents[data.id]?.updatedAt != data.updatedAt
     if Dashing.debugMode
@@ -129,10 +130,12 @@ createEventsSource = ->
       source = new EventSource(Configuration.SSEUrl)
       source.sender=new DashingEvents
       source.addEventListener 'open', (e) ->
-        console.log("Connection opened", e)
+        if Dashing.debugMode
+          console.log("Connection opened", e)
 
       source.addEventListener 'error', (e)->
-        console.log("Connection error", e)
+        if Dashing.debugMode
+          console.log("Connection error", e)
         if (e.currentTarget.readyState == EventSource.CLOSED)
           @sender.onerror(e)
 
@@ -145,16 +148,18 @@ createEventsSource = ->
         @sender.dashboards(data)
 
       source.subscribe = (widgets) ->
-        console.log("widgets")
+        if Dashing.debugMode
+          console.log("widgets")
 
 
-    when "WS"
+    when "WSBI","WS"
       source = new WebSocket(Configuration.WSUrl)
       source.sender=new DashingEvents
       source.onopen = (evt) -> 
         if Dashing.debugMode
           console.log("ws opened")
-          console.log(evt)
+          console.log(Dashing.widgets)
+        @subscribe(Dashing.widgets)          
       source.onclose = (evt) -> 
         if Dashing.debugMode
           console.log("ws closed");
@@ -166,17 +171,35 @@ createEventsSource = ->
         msgdata=JSON.parse(evt.data)
         switch msgdata.type
           when 'event'
-            for data in msgdata.data
-              @sender.message(data)
+            if Array.isArray(msgdata.data)
+              for data in msgdata.data
+                @sender.message(data)
+            else
+              @sender.message(msgdata.data)
           when 'dashboards'
             @sender.dashboards(msgdata.data)
+          when 'ack'
+            @subscribe(widgets)
+
       source.onerror = (evt) -> 
         if (evt.currentTarget.readyState == WebSocket.CLOSED)
           @sender.onerror(e)
       source.subscribe = (widgets) ->
+        if @readyState == WebSocket.CONNECTING
+          if Dashing.debugMode
+            console.log("ws is still connecting")
+          return
+        if widgets.size==0
+          if Dashing.debugMode
+            console.log("empty widgets")
+          return
+        if @sender.initdone==true
+          return
+        @sender.initdone=true
         msg = {type: 'subscribe',data: {events: Object.keys(widgets)}}
         jmsg=JSON.stringify(msg)       
         @send(jmsg)
+
     
 
   source

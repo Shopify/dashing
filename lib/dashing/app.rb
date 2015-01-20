@@ -40,7 +40,7 @@ set :public_folder, File.join(settings.root, 'public')
 set :views, File.join(settings.root, 'dashboards')
 set :default_dashboard, nil
 set :auth_token, nil
-set :eventsengine, nil
+set :eventsengine, EventsEngine.create(EventsEngineTypes::SSE)
 
 
 if File.exists?(settings.history_file)
@@ -132,8 +132,6 @@ Thin::Server.class_eval do
 end
 
 def send_event(id, body, target=nil)
-  body[:id] = id
-  body[:updatedAt] ||= Time.now.to_i
   Sinatra::Application.settings.eventsengine.send_event(id,body,target)
 end
 
