@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/kneradovsky/dashing.svg?branch=websockets)](https://travis-ci.org/kneradovsky/dashing)
+
 # Compatibility issue
 The calling job files code was moved from the gem level to the project level (__config.ru__). To make you existent jobs and lib files to be called from application one need to add the following lines of code: 
 ```ruby
