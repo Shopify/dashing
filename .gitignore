@@ -2,4 +2,5 @@
 /Gemfile.lock
 *.gem
 coverage/
+log/
 .ruby-version
