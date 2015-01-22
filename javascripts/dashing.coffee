@@ -2,6 +2,8 @@
 #= require es5-shim
 #= require batman
 #= require batman.jquery
+#= require configuration
+
 
 
 Batman.Filters.prettyNumber = (num) ->
@@ -28,8 +30,14 @@ class window.Dashing extends Batman.App
   @on 'reload', (data) ->
     window.location.reload(true)
 
+
   @root ->
+
+
 Dashing.params = Batman.URI.paramsFromQuery(window.location.search.slice(1));
+
+
+
 
 class Dashing.Widget extends Batman.View
   constructor:  ->
@@ -92,34 +100,113 @@ Dashing.widgets = widgets = {}
 Dashing.lastEvents = lastEvents = {}
 Dashing.debugMode = false
 
-source = new EventSource('events')
-source.addEventListener 'open', (e) ->
-  console.log("Connection opened", e)
+class DashingEvents
+  constructor: ->
+    @initdone=false
 
-source.addEventListener 'error', (e)->
-  console.log("Connection error", e)
-  if (e.currentTarget.readyState == EventSource.CLOSED)
-    console.log("Connection closed")
-    setTimeout (->
-      window.location.reload()
-    ), 5*60*1000
-
-source.addEventListener 'message', (e) ->
-  data = JSON.parse(e.data)
-  if lastEvents[data.id]?.updatedAt != data.updatedAt
+  message: (data) ->
+   if lastEvents[data.id]?.updatedAt != data.updatedAt
     if Dashing.debugMode
       console.log("Received data for #{data.id}", data)
     if widgets[data.id]?.length > 0
       lastEvents[data.id] = data
       for widget in widgets[data.id]
         widget.receiveData(data)
+  dashboards: (data) ->
+    if Dashing.debugMode
+      console.log("Received data for dashboards", data)
+    if data.dashboard is '*' or window.location.pathname is "/#{data.dashboard}"
+      Dashing.fire data.event, data
+  onerror: (err) ->
+    setTimeout (->
+      window.location.reload()
+    ), 5*60*1000
 
-source.addEventListener 'dashboards', (e) ->
-  data = JSON.parse(e.data)
-  if Dashing.debugMode
-    console.log("Received data for dashboards", data)
-  if data.dashboard is '*' or window.location.pathname is "/#{data.dashboard}"
-    Dashing.fire data.event, data
+
+createEventsSource = -> 
+  source=null
+  switch Configuration.EventEngine 
+    when "SSE"
+      source = new EventSource(Configuration.SSEUrl)
+      source.sender=new DashingEvents
+      source.addEventListener 'open', (e) ->
+        if Dashing.debugMode
+          console.log("Connection opened", e)
+
+      source.addEventListener 'error', (e)->
+        if Dashing.debugMode
+          console.log("Connection error", e)
+        if (e.currentTarget.readyState == EventSource.CLOSED)
+          @sender.onerror(e)
+
+      source.addEventListener 'message', (e) ->
+        data = JSON.parse(e.data)
+        @sender.message(data)
+
+      source.addEventListener 'dashboards', (e) ->
+        data = JSON.parse(e.data)
+        @sender.dashboards(data)
+
+      source.subscribe = (widgets) ->
+        if Dashing.debugMode
+          console.log("widgets")
+
+
+    when "WSBI","WS"
+      source = new WebSocket(Configuration.WSUrl)
+      source.sender=new DashingEvents
+      source.onopen = (evt) -> 
+        if Dashing.debugMode
+          console.log("ws opened")
+          console.log(Dashing.widgets)
+        @subscribe(Dashing.widgets)          
+      source.onclose = (evt) -> 
+        if Dashing.debugMode
+          console.log("ws closed");
+          console.log(evt)
+      source.onmessage = (evt) -> 
+        if Dashing.debugMode
+          console.log("ws message:")
+          console.log(evt)
+        msgdata=JSON.parse(evt.data)
+        switch msgdata.type
+          when 'event'
+            if Array.isArray(msgdata.data)
+              for data in msgdata.data
+                @sender.message(data)
+            else
+              @sender.message(msgdata.data)
+          when 'dashboards'
+            @sender.dashboards(msgdata.data)
+          when 'ack'
+            @subscribe(widgets)
+
+      source.onerror = (evt) -> 
+        if (evt.currentTarget.readyState == WebSocket.CLOSED)
+          @sender.onerror(e)
+      source.subscribe = (widgets) ->
+        if @readyState == WebSocket.CONNECTING
+          if Dashing.debugMode
+            console.log("ws is still connecting")
+          return
+        if widgets.size==0
+          if Dashing.debugMode
+            console.log("empty widgets")
+          return
+        if @sender.initdone==true
+          return
+        @sender.initdone=true
+        msg = {type: 'subscribe',data: {events: Object.keys(widgets)}}
+        jmsg=JSON.stringify(msg)       
+        @send(jmsg)
+
+    
+
+  source
+
+
 
 $(document).ready ->
+  Dashing.source=createEventsSource()
   Dashing.run()
+

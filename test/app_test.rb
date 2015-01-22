@@ -4,7 +4,7 @@ require 'haml'
 class AppTest < Dashing::Test
   def setup
     @connection = []
-    app.settings.connections = [@connection]
+    app.settings.eventsengine.instance_variable_set(:@connections,  [@connection])
     app.settings.auth_token = nil
     app.settings.default_dashboard = nil
     app.settings.history_file = File.join(Dir.tmpdir, 'history.yml')

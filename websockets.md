@@ -1,13 +1,3 @@
-# [Dashing](http://shopify.github.com/dashing)
-![](https://api.travis-ci.org/Shopify/dashing.png)
-
-Dashing is a Sinatra based framework that lets you build beautiful dashboards. It looks especially great on TVs.
-
-[Check out the homepage](http://shopify.github.com/dashing).
-
-
-# [New EventEngines and websocket support] (https://github.com/kneradovsky/dashing/tree/websockets)
-
 [![Build Status](https://travis-ci.org/kneradovsky/dashing.svg?branch=websockets)](https://travis-ci.org/kneradovsky/dashing)
 
 # Compatibility issue
@@ -80,7 +70,3 @@ __4. add engine on the client side__
   			.... create your own engine...
 ```
 > Please note that client side uses the value of the EventsEngineType's constant, not its name
-
-# License
-Distributed under the [MIT license](https://github.com/Shopify/dashing/blob/master/MIT-LICENSE)
-
