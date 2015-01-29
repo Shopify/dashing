@@ -22,6 +22,7 @@ class Dashing.Graph extends Dashing.Widget
         data: [{x:0, y:0}]
         }
       ]
+      padding: {top: 0.02, left: 0.02, right: 0.02, bottom: 0.02}
     )
 
     @graph.series[0].data = @get('points') if @get('points')
