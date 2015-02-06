@@ -13,7 +13,7 @@ class Dashing.Number extends Dashing.Widget
 
   @accessor 'arrow', ->
     if @get('last')
-      if parseInt(@get('current')) > parseInt(@get('last')) then 'fa-arrow-up' else 'fa-arrow-down'
+      if parseInt(@get('current')) > parseInt(@get('last')) then 'fa fa-arrow-up' else 'fa fa-arrow-down'
 
   onData: (data) ->
     if data.status
