@@ -129,6 +129,13 @@ class AppTest < Dashing::Test
     end
   end
 
+  def test_get_nonexistent_dashboard_sends_file_with_404_status
+    with_generated_project do
+      app.any_instance.expects(:send_file).with(anything, has_entry(:status, 404))
+      get '/nodashboard'
+    end
+  end
+
   def test_get_widget
     with_generated_project do
       get '/views/meter.html'
