@@ -152,6 +152,7 @@ class AppTest < Dashing::Test
       cli.stubs(:source_paths).returns([source_path])
       silent { cli.new 'new_project' }
 
+      app.settings.public_folder = File.join(dir, 'new_project/public')
       app.settings.views = File.join(dir, 'new_project/dashboards')
       app.settings.root = File.join(dir, 'new_project')
       yield app.settings.root
