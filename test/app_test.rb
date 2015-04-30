@@ -129,13 +129,6 @@ class AppTest < Dashing::Test
     end
   end
 
-  def test_get_nonexistent_dashboard_sends_file_with_404_status
-    with_generated_project do
-      app.any_instance.expects(:send_file).with(anything, has_entry(:status, 404))
-      get '/nodashboard'
-    end
-  end
-
   def test_get_widget
     with_generated_project do
       get '/views/meter.html'
@@ -152,6 +145,7 @@ class AppTest < Dashing::Test
       cli.stubs(:source_paths).returns([source_path])
       silent { cli.new 'new_project' }
 
+      app.settings.public_folder = File.join(dir, 'new_project/public')
       app.settings.views = File.join(dir, 'new_project/dashboards')
       app.settings.root = File.join(dir, 'new_project')
       yield app.settings.root
