@@ -57,7 +57,16 @@ class Dashing.Widget extends Batman.View
 
   receiveData: (data) =>
     @mixin(data)
+    @addStatus(data)
     @onData(data)
+
+  addStatus: (data) => 
+    if data.status
+      #clear existing "status-*" classes
+      $(@get('node')).attr 'class', (i,c) ->
+        c.replace /\bstatus-\S+/g, ''
+      # add new class
+      $(@get('node')).addClass "status-#{data.status}"
 
   onData: (data) =>
     # Widgets override this to handle incoming data
