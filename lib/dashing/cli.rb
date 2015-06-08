@@ -38,12 +38,12 @@ module Dashing
       puts "Invalid generator. Either use widget, dashboard, or job"
     end
 
-    desc "install GIST_ID", "Installs a new widget from a gist."
-    def install(gist_id)
+    desc "install GIST_ID [--skip]", "Installs a new widget from a gist (skip overwrite)."
+    def install(gist_id, *args)
       gist = Downloader.get_gist(gist_id)
       public_url = "https://gist.github.com/#{gist_id}"
 
-      install_widget_from_gist(gist)
+      install_widget_from_gist(gist, args.include?('--skip'))
 
       print set_color("Don't forget to edit the ", :yellow)
       print set_color("Gemfile ", :yellow, :bold)
@@ -89,15 +89,15 @@ module Dashing
       system(command)
     end
 
-    def install_widget_from_gist(gist)
+    def install_widget_from_gist(gist, skip_overwrite)
       gist['files'].each do |file, details|
         if file =~ /\.(html|coffee|scss)\z/
           widget_name = File.basename(file, '.*')
           new_path = File.join(Dir.pwd, 'widgets', widget_name, file)
-          create_file(new_path, details['content'])
+          create_file(new_path, details['content'], :skip => skip_overwrite)
         elsif file.end_with?('.rb')
           new_path = File.join(Dir.pwd, 'jobs', file)
-          create_file(new_path, details['content'])
+          create_file(new_path, details['content'], :skip => skip_overwrite)
         end
       end
     end

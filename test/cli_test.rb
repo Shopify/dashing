@@ -68,10 +68,10 @@ class CLITest < Dashing::Test
     Dir.stubs(:pwd).returns('')
 
     Dashing::Downloader.stubs(:get_gist).returns(JSON.parse(json_response))
-    @cli.stubs(:create_file).with('/jobs/ruby_job.rb', 'some job content').once
-    @cli.stubs(:create_file).with('/widgets/num/num.html', 'some html content').once
-    @cli.stubs(:create_file).with('/widgets/num/num.scss', 'some sass content').once
-    @cli.stubs(:create_file).with('/widgets/num/num.coffee', 'some coffee content').once
+    @cli.stubs(:create_file).with('/jobs/ruby_job.rb', 'some job content', {:skip => false}).once
+    @cli.stubs(:create_file).with('/widgets/num/num.html', 'some html content', {:skip => false}).once
+    @cli.stubs(:create_file).with('/widgets/num/num.scss', 'some sass content', {:skip => false}).once
+    @cli.stubs(:create_file).with('/widgets/num/num.coffee', 'some coffee content', {:skip => false}).once
 
     capture_io { @cli.install(123) }
   end
