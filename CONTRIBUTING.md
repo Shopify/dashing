@@ -7,7 +7,7 @@ Below you will find a set of guidelines that will ensure the best outcome
 for you _and_ Dashing.
 
 <a name="issues"></a>
-## Have an Issue
+## Have an Issue?
 If you run into problems with Dashing, please take these steps before
 submitting an issue:
 
