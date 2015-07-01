@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
   s.add_dependency('sinatra-contrib', '~> 1.4.2')
   s.add_dependency('thin', '~> 1.6.1')
   s.add_dependency('rufus-scheduler', '~> 2.0.24')
-  s.add_dependency('thor', '~> 0.18.1')
+  s.add_dependency('thor', '> 0.18.1')
   s.add_dependency('sprockets', '~> 2.10.1')
   s.add_dependency('rack', '~> 1.5.4')
 
