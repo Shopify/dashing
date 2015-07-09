@@ -102,6 +102,9 @@ end
 post '/widgets/:id' do
   request.body.rewind
   body = JSON.parse(request.body.read)
+  if body.is_a?(Array)
+    body = {:data => body}
+  end
   auth_token = body.delete("auth_token")
   if !settings.auth_token || settings.auth_token == auth_token
     send_event(params['id'], body)
