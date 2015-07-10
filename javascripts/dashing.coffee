@@ -110,6 +110,7 @@ source.addEventListener 'error', (e)->
 
 source.addEventListener 'message', (e) ->
   clearTimeout(errorTimerId)
+  errorTimerId = null
   data = JSON.parse(e.data)
   if lastEvents[data.id]?.updatedAt != data.updatedAt
     if Dashing.debugMode
