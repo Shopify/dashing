@@ -9,6 +9,6 @@ class Dashing.Meter extends Dashing.Widget
 
   ready: ->
     meter = $(@node).find(".meter")
-    meter.attr("data-bgcolor", meter.css("background-color"))
-    meter.attr("data-fgcolor", meter.css("color"))
+    meter.css("background-color", meter.data("bgcolor"))
+    meter.css("color", meter.data("fgcolor"))
     meter.knob()
