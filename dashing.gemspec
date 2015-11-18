@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.author      = "Daniel Beauchamp"
   s.email       = 'daniel.beauchamp@shopify.com'
   s.homepage    = 'http://shopify.github.com/dashing'
+  s.license     = "MIT"
 
   s.files = Dir['README.md', 'javascripts/**/*', 'templates/**/*','templates/**/.[a-z]*', 'lib/**/*']
 
