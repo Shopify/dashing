@@ -23,6 +23,11 @@ helpers do
   def protected!
     # override with auth logic
   end
+
+  def authenticated?(token)
+    return true unless settings.auth_token
+    token && Rack::Utils.secure_compare(settings.auth_token, token)
+  end
 end
 
 set :root, Dir.pwd
@@ -89,8 +94,7 @@ post '/dashboards/:id' do
   request.body.rewind
   body = JSON.parse(request.body.read)
   body['dashboard'] ||= params['id']
-  auth_token = body.delete("auth_token")
-  if !settings.auth_token || settings.auth_token == auth_token
+  if authenticated?(body.delete("auth_token"))
     send_event(params['id'], body, 'dashboards')
     204 # response without entity body
   else
@@ -102,8 +106,7 @@ end
 post '/widgets/:id' do
   request.body.rewind
   body = JSON.parse(request.body.read)
-  auth_token = body.delete("auth_token")
-  if !settings.auth_token || settings.auth_token == auth_token
+  if authenticated?(body.delete("auth_token"))
     send_event(params['id'], body)
     204 # response without entity body
   else
