@@ -94,7 +94,7 @@ post '/dashboards/:id' do
   request.body.rewind
   body = JSON.parse(request.body.read)
   body['dashboard'] ||= params['id']
-  if authenticated?(body.delete("auth_token"))
+  if authenticated?(params[:auth_token] || body.delete("auth_token"))
     send_event(params['id'], body, 'dashboards')
     204 # response without entity body
   else
@@ -106,7 +106,7 @@ end
 post '/widgets/:id' do
   request.body.rewind
   body = JSON.parse(request.body.read)
-  if authenticated?(body.delete("auth_token"))
+  if authenticated?(params[:auth_token] || body.delete("auth_token"))
     send_event(params['id'], body)
     204 # response without entity body
   else
