@@ -3,5 +3,6 @@ rvm:
   - 2.3.0
   - 2.2.4
   - 2.1.8
-
+  - jruby-19mode
+  - jruby-9.0.4.0
 script: "rake test"

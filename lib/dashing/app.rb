@@ -7,7 +7,6 @@ require 'sinatra/content_for'
 require 'sinatra/streaming'
 require 'sprockets'
 require 'yaml'
-require 'thin'
 
 SCHEDULER = Rufus::Scheduler.new
 
@@ -132,16 +131,6 @@ get '/views/:widget?.html' do
     file = File.join(settings.root, "widgets", params[:widget], "#{params[:widget]}.#{suffix}")
     return engines.first.new(file).render if File.exist? file
   end
-end
-
-Thin::Server.class_eval do
-  def stop_with_connection_closing
-    Sinatra::Application.settings.connections.dup.each(&:close)
-    stop_without_connection_closing
-  end
-
-  alias_method :stop_without_connection_closing, :stop
-  alias_method :stop, :stop_with_connection_closing
 end
 
 def send_event(id, body, target=nil)

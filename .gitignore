@@ -3,6 +3,5 @@
 *.gem
 coverage/
 log/
-tmp/
 .ruby-version
 history.yml
