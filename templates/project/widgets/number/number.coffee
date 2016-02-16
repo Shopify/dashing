@@ -3,8 +3,8 @@ class Dashing.Number extends Dashing.Widget
 
   @accessor 'difference', ->
     if @get('last')
-      last = parseInt(@get('last'))
-      current = parseInt(@get('current'))
+      last = @parseValue(@get('last'))
+      current = @parseValue(@get('current'))
       if last != 0
         diff = Math.abs(Math.round((current - last) / last * 100))
         "#{diff}%"
@@ -13,7 +13,7 @@ class Dashing.Number extends Dashing.Widget
 
   @accessor 'arrow', ->
     if @get('last')
-      if parseInt(@get('current')) > parseInt(@get('last')) then 'icon-arrow-up' else 'icon-arrow-down'
+      if @parseValue(@get('current')) > @parseValue(@get('last')) then 'icon-arrow-up' else 'icon-arrow-down'
 
   onData: (data) ->
     if data.status
@@ -22,3 +22,8 @@ class Dashing.Number extends Dashing.Widget
         c.replace /\bstatus-\S+/g, ''
       # add new class
       $(@get('node')).addClass "status-#{data.status}"
+
+  parseValue: (number) ->
+    if number == parseInt(number, 10) then parseInt(number) else parseFloat(number)
+
+
