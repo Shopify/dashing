@@ -59,7 +59,7 @@ not_found do
 end
 
 at_exit do
-  File.write(settings.history_file, settings.history.to_yaml)
+  persist_history(settings)
 end
 
 get '/' do
@@ -139,6 +139,7 @@ def send_event(id, body, target=nil)
   event = format_event(body.to_json, target)
   Sinatra::Application.settings.history[id] = event unless target == 'dashboards'
   Sinatra::Application.settings.connections.each { |out| out << event }
+  persist_history(Sinatra::Application.settings)
 end
 
 def format_event(body, name=nil)
@@ -163,6 +164,12 @@ def tilt_html_engines
   Tilt.mappings.select do |_, engines|
     default_mime_type = engines.first.default_mime_type
     default_mime_type.nil? || default_mime_type == 'text/html'
+  end
+end
+
+def persist_history(settings)
+  File.open(settings.history_file, 'w') do |f|
+    f.puts settings.history.to_yaml
   end
 end
 
