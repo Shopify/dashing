@@ -3,8 +3,7 @@ require 'haml'
 
 class AppTest < Dashing::Test
   def setup
-    @connection = []
-    app.settings.connections = [@connection]
+    app.settings.client_events = {'tests' => []}
     app.settings.auth_token = nil
     app.settings.default_dashboard = nil
     app.settings.history_file = File.join(Dir.tmpdir, 'history.yml')
@@ -49,8 +48,8 @@ class AppTest < Dashing::Test
     post '/widgets/some_widget', JSON.generate({value: 6})
     assert_equal 204, last_response.status
 
-    assert_equal 1, @connection.length
-    data = parse_data @connection[0]
+    assert_equal 1, app.settings.client_events.length
+    data = parse_data app.settings.client_events.values.first.first
     assert_equal 6, data['value']
     assert_equal 'some_widget', data['id']
     assert data['updatedAt']
@@ -72,19 +71,15 @@ class AppTest < Dashing::Test
     post '/widgets/some_widget', JSON.generate({value: 8})
     assert_equal 204, last_response.status
 
-    get '/events'
-    assert_equal 200, last_response.status
-    assert_equal 8, parse_data(@connection[0])['value']
+    assert_equal 8, parse_data(app.settings.client_events.values.first.first)['value']
   end
 
   def test_dashboard_events
     post '/dashboards/my_super_sweet_dashboard', JSON.generate({event: 'reload'})
     assert_equal 204, last_response.status
 
-    get '/events'
-    assert_equal 200, last_response.status
-    assert_equal 'dashboards', parse_event(@connection[0])
-    assert_equal 'reload', parse_data(@connection[0])['event']
+    assert_equal 'dashboards', parse_event(app.settings.client_events.values.first.first)
+    assert_equal 'reload', parse_data(app.settings.client_events.values.first.first)['event']
   end
 
   def test_get_dashboard

@@ -1,4 +1,6 @@
+require 'securerandom'
 require 'sinatra'
+require 'sinatra/streaming'
 require 'sprockets'
 require 'sinatra/content_for'
 require 'rufus/scheduler'
@@ -34,7 +36,7 @@ set :root, Dir.pwd
 set :sprockets,     Sprockets::Environment.new(settings.root)
 set :assets_prefix, '/assets'
 set :digest_assets, false
-set server: 'thin', connections: [], history_file: 'history.yml'
+set server: 'puma', client_events: {}, history_file: 'history.yml'
 set :public_folder, File.join(settings.root, 'public')
 set :views, File.join(settings.root, 'dashboards')
 set :default_dashboard, nil
@@ -73,10 +75,15 @@ end
 get '/events', provides: 'text/event-stream' do
   protected!
   response.headers['X-Accel-Buffering'] = 'no' # Disable buffering for nginx
-  stream :keep_open do |out|
-    settings.connections << out
+  client_id = SecureRandom.uuid
+  stream do |out|
     out << latest_events
-    out.callback { settings.connections.delete(out) }
+    loop do
+      settings.client_events[client_id] = [] unless settings.client_events.has_key?(client_id)
+      while event = settings.client_events[client_id].shift do
+        out << event unless out.closed?
+      end
+    end
   end
 end
 
@@ -138,7 +145,14 @@ def send_event(id, body, target=nil)
   body[:updatedAt] ||= Time.now.to_i
   event = format_event(body.to_json, target)
   Sinatra::Application.settings.history[id] = event unless target == 'dashboards'
-  Sinatra::Application.settings.connections.each { |out| out << event }
+  max_event_queue_size = Sinatra::Application.settings.history.length * 2
+  Sinatra::Application.settings.client_events.each do |connection_id, events|
+    if events.length > max_event_queue_size
+      Sinatra::Application.settings.client_events.delete(connection_id)
+    else
+      events << event
+    end
+  end
 end
 
 def format_event(body, name=nil)
