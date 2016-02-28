@@ -36,7 +36,7 @@ set :root, Dir.pwd
 set :sprockets,     Sprockets::Environment.new(settings.root)
 set :assets_prefix, '/assets'
 set :digest_assets, false
-set server: 'puma', client_events: {}, history_file: 'history.yml'
+set server: 'puma', connections: [], history_file: 'history.yml'
 set :public_folder, File.join(settings.root, 'public')
 set :views, File.join(settings.root, 'dashboards')
 set :default_dashboard, nil
@@ -72,18 +72,23 @@ get '/' do
   redirect "/" + dashboard
 end
 
+
 get '/events', provides: 'text/event-stream' do
   protected!
   response.headers['X-Accel-Buffering'] = 'no' # Disable buffering for nginx
-  client_id = SecureRandom.uuid
   stream do |out|
     out << latest_events
+    settings.connections << connection = {out: out, mutex: Mutex.new, terminated: false}
+    terminated = false
+
     loop do
-      settings.client_events[client_id] = [] unless settings.client_events.has_key?(client_id)
-      while event = settings.client_events[client_id].shift do
-        out << event unless out.closed?
+      connection[:mutex].synchronize do
+        terminated = true if connection[:terminated]
       end
+      break if terminated
     end
+
+    settings.connections.delete(connection)
   end
 end
 
@@ -145,12 +150,16 @@ def send_event(id, body, target=nil)
   body[:updatedAt] ||= Time.now.to_i
   event = format_event(body.to_json, target)
   Sinatra::Application.settings.history[id] = event unless target == 'dashboards'
-  max_event_queue_size = Sinatra::Application.settings.history.length * 2
-  Sinatra::Application.settings.client_events.each do |connection_id, events|
-    if events.length > max_event_queue_size
-      Sinatra::Application.settings.client_events.delete(connection_id)
-    else
-      events << event
+  Sinatra::Application.settings.connections.each do |connection|
+    connection[:mutex].synchronize do
+      begin
+        connection[:out] << event unless connection[:out].closed?
+      rescue Puma::ConnectionError
+        connection[:terminated] = true
+      rescue Exception => e
+        connection[:terminated] = true
+        puts e
+      end
     end
   end
 end
