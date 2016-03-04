@@ -1,0 +1,257 @@
+/*
+  //=require_directory .
+  //=require_tree ../../widgets
+*/
+// ----------------------------------------------------------------------------
+// Sass declarations
+// ----------------------------------------------------------------------------
+$background-color: #222;
+$text-color: #fff;
+
+$background-warning-color-1: #e82711;
+$background-warning-color-2: #9b2d23;
+$text-warning-color: #fff;
+
+$background-danger-color-1: #eeae32;
+$background-danger-color-2: #ff9618;
+$text-danger-color: #fff;
+
+@-webkit-keyframes status-warning-background {
+  0%   { background-color: $background-warning-color-1; }
+  50%  { background-color: $background-warning-color-2; }
+  100% { background-color: $background-warning-color-1; }
+}
+@-webkit-keyframes status-danger-background {
+  0%   { background-color: $background-danger-color-1; }
+  50%  { background-color: $background-danger-color-2; }
+  100% { background-color: $background-danger-color-1; }
+}
+@mixin animation($animation-name, $duration, $function, $animation-iteration-count:""){
+  -webkit-animation:  $animation-name $duration $function #{$animation-iteration-count};
+  -moz-animation:     $animation-name $duration $function #{$animation-iteration-count};
+  -ms-animation:      $animation-name $duration $function #{$animation-iteration-count};
+}
+
+// ----------------------------------------------------------------------------
+// Base styles
+// ----------------------------------------------------------------------------
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: $background-color;
+  font-size: 20px;
+  color: $text-color;
+  font-family: 'Open Sans', "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+b, strong {
+  font-weight: bold;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+img {
+  border: 0;
+  -ms-interpolation-mode: bicubic;
+  vertical-align: middle;
+}
+
+img, object {
+  max-width: 100%;
+}
+
+iframe {
+  max-width: 100%;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+}
+
+td {
+  vertical-align: middle;
+}
+
+ul, ol {
+  padding: 0;
+  margin: 0;
+}
+
+h1, h2, h3, h4, h5, p {
+  padding: 0;
+  margin: 0;
+}
+h1 {
+  margin-bottom: 12px;
+  text-align: center;
+  font-size: 30px;
+  font-weight: 400;
+}
+h2 {
+  text-transform: uppercase;
+  font-size: 76px;
+  font-weight: 700;
+  color: $text-color;
+}
+h3 {
+  font-size: 25px;
+  font-weight: 600;
+  color: $text-color;
+}
+
+// ----------------------------------------------------------------------------
+// Base widget styles
+// ----------------------------------------------------------------------------
+.gridster {
+  margin: 0px auto;
+}
+
+.icon-background {
+  width: 100%!important;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0.1;
+  font-size: 275px;
+  text-align: center;
+  margin-top: 82px;
+}
+
+.list-nostyle {
+  list-style: none;
+}
+
+.gridster ul {
+  list-style: none;
+}
+
+.gs_w {
+  width: 100%;
+  display: table;
+  cursor: pointer;
+}
+
+.widget {
+  padding: 25px 12px;
+  text-align: center;
+  width: 100%;
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.widget.status-warning {
+  background-color: $background-warning-color-1;
+  @include animation(status-warning-background, 2s, ease, infinite);
+
+  .icon-warning-sign {
+    display: inline-block;
+  }
+
+  .title, .more-info {
+    color: $text-warning-color;
+  }
+}
+
+.widget.status-danger {
+  color: $text-danger-color;
+  background-color: $background-danger-color-1;
+  @include animation(status-danger-background, 2s, ease, infinite);
+
+  .icon-warning-sign {
+    display: inline-block;
+  }
+
+  .title, .more-info {
+    color: $text-danger-color;
+  }
+}
+
+.more-info {
+  font-size: 15px;
+  position: absolute;
+  bottom: 32px;
+  left: 0;
+  right: 0;
+}
+
+.updated-at {
+  font-size: 15px;
+  position: absolute;
+  bottom: 12px;
+  left: 0;
+  right: 0;
+}
+
+#save-gridster {
+  display: none;
+  position: fixed;
+  top: 0;
+  margin: 0px auto;
+  left: 50%;
+  z-index: 1000;
+  background: black;
+  width: 190px;
+  text-align: center;
+  border: 1px solid white;
+  border-top: 0px;
+  margin-left: -95px;
+  padding: 15px;
+}
+
+#save-gridster:hover {
+  padding-top: 25px;
+}
+
+#saving-instructions {
+  display: none;
+  padding: 10px;
+  width: 500px;
+  height: 122px;
+  z-index: 1000;
+  background: white;
+  top: 100px;
+  color: black;
+  font-size: 15px;
+  padding-bottom: 4px;
+
+  textarea {
+    white-space: nowrap;
+    width: 494px;
+    height: 80px;
+  }
+}
+
+#lean_overlay {
+    position: fixed;
+    z-index:100;
+    top: 0px;
+    left: 0px;
+    height:100%;
+    width:100%;
+    background: #000;
+    display: none;
+}
+
+#container {
+  padding-top: 5px;
+}
+
+
+// ----------------------------------------------------------------------------
+// Clearfix
+// ----------------------------------------------------------------------------
+.clearfix:before, .clearfix:after { content: "\0020"; display: block; height: 0; overflow: hidden; }
+.clearfix:after { clear: both; }
+.clearfix { zoom: 1; }
+
