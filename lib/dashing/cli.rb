@@ -59,14 +59,8 @@ module Dashing
     def start(*args)
       port_option = args.include?('-p') ? '' : ' -p 3030'
       args = args.join(' ')
-      command = "bundle exec thin -R config.ru start#{port_option} #{args}"
+      command = "bundle exec puma #{port_option} #{args} config.ru"
       command.prepend "export JOB_PATH=#{options[:job_path]}; " if options[:job_path]
-      run_command(command)
-    end
-
-    desc "stop", "Stops the thin server"
-    def stop
-      command = "bundle exec thin stop"
       run_command(command)
     end
 
