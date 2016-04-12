@@ -1,7 +1,7 @@
-@mixin border-radius($radius_value) { 
+@mixin border-radius($radius_value) {
   -webkit-border-radius:  $radius_value;
   -moz-border-radius:     $radius_value;
-  border-radius:          $radius_value; 
+  border-radius:          $radius_value;
 }
 article, aside, details, figcaption, figure, footer, header, hgroup, nav, section { display: block; }
 audio, canvas, video { display: inline-block; *display: inline; *zoom: 1; }
@@ -15,7 +15,7 @@ body { background: #fafafa; margin: 0; font-size: 1em; line-height: 1.4; }
 ::-moz-selection { background: #222; color: #fff; text-shadow: none; }
 ::selection { background: #222; color: #fff; text-shadow: none; }
 
-a { 
+a {
   color: #444;
   &:hover { color: #000; }
   &:focus { outline: thin dotted; }
@@ -50,7 +50,7 @@ td { vertical-align: top; }
 
 //------------------------------------------------------
 
-h1 { 
+h1 {
   font-family: 'Cutive', serif;
   font-weight: 400;
   font-size: 65px;
@@ -66,7 +66,7 @@ h2 {
   margin: 0 0 5px
 }
 
-h3 { 
+h3 {
   font-family: 'Quando', serif;
   font-weight: 400;
   font-size: 32px;
@@ -127,7 +127,7 @@ code {
 
 #main-navigation {
   margin-bottom: 25px;
-  li { 
+  li {
     border: 1px #ccc solid;
     float: left;
     margin: 2px 6px 0 0;
@@ -138,9 +138,18 @@ code {
     text-decoration: none;
     color: #222;
     &:hover {
-      background-color: #dedede;      
+      background-color: #dedede;
     }
   }
+}
+
+
+.deprecation-warning {
+  background: #fcf8e3;
+  border: 1px solid #FFD706;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 
 .back-up-link {
@@ -161,12 +170,12 @@ code {
   line-height: 50px;
   text-align: center;
   background-color: #1975bc;
-  border: 1px darken(#1975bc, 10%) solid; 
+  border: 1px darken(#1975bc, 10%) solid;
   text-shadow: 0 1px 0 darken(#1975bc, 12%);
   font-size: 18px;
   font-family: 'Quando', serif;
   font-weight: 300;
-  color: #fff; 
+  color: #fff;
   text-decoration: none;
   @include border-radius(3px);
   i{
@@ -188,9 +197,9 @@ code {
   margin-bottom: 20px;
 }
 .gist .gist-file .gist-data {
-  background-color: #f8f8ff!important; 
+  background-color: #f8f8ff!important;
 }
-.gist-meta{ 
+.gist-meta{
   font-family: Helvetica,Arial,sans-serif;
   font-size:13px!important;
   a {

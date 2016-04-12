@@ -187,7 +187,7 @@ code {
 
 #heading {
   position: relative;
-  margin: 0 0 65px; }
+  margin: 0 0 30px; }
 
 #logo-heading {
   float: left; }
@@ -212,6 +212,14 @@ code {
     color: #222; }
     #main-navigation a:hover {
       background-color: #dedede; }
+
+.deprecation-warning {
+  background: #fcf8e3;
+  border: 1px solid #FFD706;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
 
 .back-up-link {
   position: absolute;
