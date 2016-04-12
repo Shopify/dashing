@@ -1,7 +1,7 @@
 <a name="issues"></a>
 ## Have an Issue?
 
-Dashing is no longer being actively maintained. There are no guarantees that your issue will be looked at. Your best bet is to:
+Dashing is no longer being actively maintained.
 
 1. Check the [Troubleshooting Guide](https://github.com/Shopify/dashing/wiki#how-tos) in the wiki.
 2. Use the [GitHub Issue Search](https://help.github.com/articles/searching-issues/) to check if the issue has already been reported.
