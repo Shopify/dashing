@@ -10,7 +10,7 @@ Dashing is no longer being actively maintained.
 
 <a name="features"></a>
 
-Dashing is no longer being actively maintained. If you feel that you have a really amazing, super neato idea that should be a part of Dashing, it may be a good candidate for an external Gem which supercharges a project. An excellent example of this is
+If you feel that you have a really amazing, super neato idea that should be a part of Dashing, it may be a good candidate for an external Gem which supercharges a project. An excellent example of this is
 [dashing-contrib](https://github.com/QubitProducts/dashing-contrib). If you
 do create a third-party extension for Dashing, please add it [here](https://github.com/Shopify/dashing/wiki/Additional-Widgets#other-third-party-tools).
 
