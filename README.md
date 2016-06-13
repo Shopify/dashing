@@ -5,7 +5,7 @@ Dashing is a Sinatra based framework that lets you build beautiful dashboards. I
 
 [Check out the homepage](http://shopify.github.com/dashing).
 
-Note: Dashing is no longer being actively maintained. Read about it [here](https://github.com/Shopify/dashing/issues/711).
+Note: Dashing is no longer being actively maintained. Read about it [here](https://github.com/Shopify/dashing/issues/711). There is a fork of the project being maintained at at [https://github.com/dashing-io/dashing](https://github.com/dashing-io/dashing)
 
 # License
 Distributed under the [MIT license](MIT-LICENSE)
