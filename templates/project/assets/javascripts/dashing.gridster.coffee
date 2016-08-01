@@ -26,9 +26,7 @@ Dashing.showGridsterInstructions = ->
       <script type='text/javascript'>\n
       $(function() {\n
       \ \ Dashing.gridsterLayout('#{JSON.stringify(Dashing.currentWidgetPositions)}')\n
-      });\n
-      </script>
-    ")
+      });\n</script>")
 
 $ ->
   $('#save-gridster').leanModal()
