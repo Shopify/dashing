@@ -1,0 +1,7 @@
+<h1 class="title" data-bind="title"></h1>
+<div class="comment-container">
+  <h3><img data-bind-src='current_comment.avatar'/><span data-bind='current_comment.name' class="name"></span></h3>
+  <p class="comment" data-bind='quote'></p>
+</div>
+
+<p class="more-info" data-bind="moreinfo"></p>
