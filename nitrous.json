@@ -1,0 +1,11 @@
+{
+  "template": "ruby",
+  "ports": [3030],
+  "name": "Dashing",
+  "description": "Dashing is a Sinatra based framework that lets you build beautiful dashboards. It looks especially great on TVs.",
+  "no_clone": true,
+  "scripts": {
+    "post-create": "cd /home/nitrous/code && gem install dashing && dashing new sweet_dashboard_project && cd sweet_dashboard_project && bundle",
+    "Start Dashing": "cd ~/code/sweet_dashboard_project && dashing start"
+  }
+}
