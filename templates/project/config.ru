@@ -1,7 +1,8 @@
 require 'dashing'
+require 'securerandom'
 
 configure do
-  set :auth_token, 'YOUR_AUTH_TOKEN'
+  set :auth_token, ENV['AUTH_TOKEN'] || SecureRandom.uuid
 
   helpers do
     def protected!
