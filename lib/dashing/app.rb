@@ -121,6 +121,7 @@ get '/views/:widget?.html' do
     file = File.join(settings.root, "widgets", params[:widget], "#{params[:widget]}.#{suffix}")
     return engines.first.new(file).render if File.exist? file
   end
+  "Drats! Unable to find a widget file named: #{params[:widget]} to render."
 end
 
 Thin::Server.class_eval do

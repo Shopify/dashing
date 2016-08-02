@@ -137,6 +137,14 @@ class AppTest < Dashing::Test
     end
   end
 
+  def test_get_nonexistent_widget
+    with_generated_project do
+      get '/views/nowidget.html'
+      assert_equal 200, last_response.status
+      assert_equal last_response.body, 'Drats! Unable to find a widget file named: nowidget to render.'
+    end
+  end
+
   def with_generated_project
     source_path = File.expand_path('../../templates', __FILE__)
 
