@@ -1,10 +1,16 @@
 require 'test_helper'
 require 'haml'
 
+class StreamStub < Array
+  def closed?
+    return false
+  end
+end
+
 class AppTest < Dashing::Test
   def setup
-    @connection = []
-    app.settings.connections = [@connection]
+    @connection = {out: StreamStub.new, mutex: Mutex.new, terminated: false}
+    app.settings.connections = [ @connection ]
     app.settings.auth_token = nil
     app.settings.default_dashboard = nil
     app.settings.history_file = File.join(Dir.tmpdir, 'history.yml')
@@ -48,9 +54,8 @@ class AppTest < Dashing::Test
   def test_post_widgets_without_auth_token
     post '/widgets/some_widget', JSON.generate({value: 6})
     assert_equal 204, last_response.status
-
-    assert_equal 1, @connection.length
-    data = parse_data @connection[0]
+    assert_equal 1, @connection[:out].length
+    data = parse_data @connection[:out][0]
     assert_equal 6, data['value']
     assert_equal 'some_widget', data['id']
     assert data['updatedAt']
@@ -72,19 +77,15 @@ class AppTest < Dashing::Test
     post '/widgets/some_widget', JSON.generate({value: 8})
     assert_equal 204, last_response.status
 
-    get '/events'
-    assert_equal 200, last_response.status
-    assert_equal 8, parse_data(@connection[0])['value']
+    assert_equal 8, parse_data(@connection[:out][0])['value']
   end
 
   def test_dashboard_events
     post '/dashboards/my_super_sweet_dashboard', JSON.generate({event: 'reload'})
     assert_equal 204, last_response.status
 
-    get '/events'
-    assert_equal 200, last_response.status
-    assert_equal 'dashboards', parse_event(@connection[0])
-    assert_equal 'reload', parse_data(@connection[0])['event']
+    assert_equal 'dashboards', parse_event(@connection[:out][0])
+    assert_equal 'reload', parse_data(@connection[:out][0])['event']
   end
 
   def test_get_dashboard
