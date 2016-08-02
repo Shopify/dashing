@@ -101,15 +101,21 @@ source = new EventSource('events')
 source.addEventListener 'open', (e) ->
   console.log("Connection opened", e)
 
+errorTimerId = null
+
 source.addEventListener 'error', (e)->
   console.log("Connection error", e)
-  if (e.currentTarget.readyState == EventSource.CLOSED)
+  UNINITIALIZED = 0
+  if (e.currentTarget.readyState == UNINITIALIZED ||
+        e.currentTarget.readyState == EventSource.CLOSED)
     console.log("Connection closed")
-    setTimeout (->
+    errorTimerId = setTimeout (->
       window.location.reload()
     ), 5*60*1000
 
 source.addEventListener 'message', (e) ->
+  clearTimeout(errorTimerId)
+  errorTimerId = null
   data = JSON.parse(e.data)
   if lastEvents[data.id]?.updatedAt != data.updatedAt
     if Dashing.debugMode
@@ -128,3 +134,4 @@ source.addEventListener 'dashboards', (e) ->
 
 $(document).ready ->
   Dashing.run()
+
