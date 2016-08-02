@@ -83,7 +83,7 @@ Dashing.AnimatedValue =
         @[timer] =
           setInterval =>
             num = if up then Math.ceil(num+num_interval) else Math.floor(num-num_interval)
-            if (up && num > to) || (!up && num < to)
+            if (up && num >= to) || (!up && num <= to)
               num = to
               clearInterval(@[timer])
               @[timer] = null
