@@ -39,6 +39,7 @@ set :public_folder, File.join(settings.root, 'public')
 set :views, File.join(settings.root, 'dashboards')
 set :default_dashboard, nil
 set :auth_token, nil
+set :event_handlers, {}
 
 if File.exists?(settings.history_file)
   set history: YAML.load_file(settings.history_file)
@@ -94,7 +95,7 @@ post '/dashboards/:id' do
   request.body.rewind
   body = JSON.parse(request.body.read)
   body['dashboard'] ||= params['id']
-  if authenticated?(body.delete("auth_token"))
+  if authenticated?(params[:auth_token] || body.delete("auth_token"))
     send_event(params['id'], body, 'dashboards')
     204 # response without entity body
   else
@@ -106,8 +107,20 @@ end
 post '/widgets/:id' do
   request.body.rewind
   body = JSON.parse(request.body.read)
-  if authenticated?(body.delete("auth_token"))
+  if authenticated?(params[:auth_token] || body.delete("auth_token"))
     send_event(params['id'], body)
+    204 # response without entity body
+  else
+    status 401
+    "Invalid API key\n"
+  end
+end
+
+post '/trigger/:id' do
+  request.body.rewind
+  body = JSON.parse(request.body.read)
+  if authenticated?(params[:auth_token] || body.delete("auth_token"))
+    call_event_handlers(params['id'], body)
     204 # response without entity body
   else
     status 401
@@ -136,9 +149,25 @@ end
 def send_event(id, body, target=nil)
   body[:id] = id
   body[:updatedAt] ||= Time.now.to_i
+  call_event_handlers(id, body)
   event = format_event(body.to_json, target)
   Sinatra::Application.settings.history[id] = event unless target == 'dashboards'
   Sinatra::Application.settings.connections.each { |out| out << event }
+end
+
+def call_event_handlers(id, body)
+  if Sinatra::Application.event_handlers[id]
+    Sinatra::Application.event_handlers[id].each do |handler|
+      handler.call(body)
+    end
+  end
+end
+
+def handle_event(id, &block)
+  unless Sinatra::Application.event_handlers[id]
+    Sinatra::Application.event_handlers[id] = []
+  end
+  Sinatra::Application.event_handlers[id] << block
 end
 
 def format_event(body, name=nil)
