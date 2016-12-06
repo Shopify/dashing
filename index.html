@@ -32,10 +32,9 @@
     <nav id="main-navigation">
       <ul class="clearfix">
         <li><a href="#overview">Introduction</a></li>
-        <li><a href="http://dashingdemo.herokuapp.com/sample" target="_blank">Demo</a></li>
         <li><a href="#setup">Getting Started</a></li>
-        <li><a href="#widgets">Example Setup</a></li>
-        <li><a href="#data">API</a></li>
+        <li><a href="#usage">Usage: Dashboard</a></li>
+        <li><a href="#data">Usage: Jobs and Widgets</a></li>
         <li><a href="#license">License</a></li>
         <li><a href="https://github.com/Shopify/dashing/issues" target="_blank">Issues</a></li>
       </ul>
@@ -52,6 +51,7 @@
       <div id="actions">
         <a class="button" href="https://github.com/Shopify/dashing" target="_blank"><i class="icon-github"></i> View on Github</a>
         <a class="button" href="https://github.com/Shopify/dashing/zipball/master"><i class="icon-download"></i> Download ZIP</a>
+        <a class="button" href="http://dashingdemo.herokuapp.com/sample" target="_blank"><i class="icon-dashboard"></i> Try demo</a>
       </div>
       <div id="actions-github">
         <iframe src="http://ghbtns.com/github-btn.html?user=shopify&repo=dashing&type=fork&count=false"
@@ -75,7 +75,7 @@
 
         <p><strong>Key features:</strong>
         <ul>
-          <li>Use premade widgets, or fully create your own with scss, html, and coffeescript.</li>
+          <li>Use <a href="#widgets">premade widgets</a>, or fully create your own with scss, html, and coffeescript.</li>
           <li>Widgets harness the power of data bindings to keep things DRY and simple. Powered by <a href="http://batmanjs.org/" target="_blank">batman.js</a>.</li>
           <li>Use the API to push data to your dashboards, or make use of a simple ruby DSL for fetching data.</li>
           <li>Drag & Drop interface for re-arranging your widgets.</li>
@@ -125,8 +125,8 @@
       </div>
     </section>
 
-    <section class="section-box" id="widgets">
-      <h3 class="section-title">Example Dashboard</h3>
+    <section class="section-box" id="usage">
+      <h3 class="section-title">Usage: Dashboard</h3>
       <div class="section-content">
         Here's a sample dashboard with 2 widgets. With a name of <code>sample.erb</code>, it becomes accessible at <code>/sample</code>.
         <br/>
@@ -175,7 +175,7 @@
     </section>
 
     <section class="section-box" id="data">
-      <h3 class="section-title">Getting Data Into Your Widgets</h3>
+      <h3 class="section-title">Usage: Jobs and Widgets</h3>
       <div class="section-content">
 
         <p>Providing data to widgets is easy. You specify which widget you want using a widget id, and then pass in the JSON data. There are two ways to do this:</p>
@@ -218,6 +218,23 @@
         <h6>Example</h6>
 
         <script src="https://gist.github.com/davefp/6112780.js?file=curl2.sh"></script>
+
+        <h4>Widgets</h4>
+
+        <p>Dashing comes with few re-usable widgets (reminder: <i>data-view="WidgetName"</i> in dashboard defines the used widget):
+          <ul>
+            <li>clock</li>
+            <li>comments</li>
+            <li>graph</li>
+            <li>iframe</li> 
+            <li>image</li>
+            <li>list</li>
+            <li>meter</li>
+            <li>number</li>
+            <li>text</li>
+          </ul>
+          </p>
+          <p>In addition, there are a <a href="https://github.com/Shopify/dashing/wiki/Additional-Widgets">lot of 3rd party widgets available</a> -  and you're welcome to contribute more!</p>
 
         </div>
       </section>

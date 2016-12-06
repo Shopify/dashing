@@ -134,7 +134,7 @@ code {
   }
   a {
     display: block;
-    padding: 12px 30px;
+    padding: 12px 24px;
     text-decoration: none;
     color: #222;
     &:hover {
@@ -165,14 +165,14 @@ code {
   float: right;
   margin: 0 5px 0 0;
   display: block;
-  width: 250px;
+  width: 180px;
   height: 50px;
   line-height: 50px;
   text-align: center;
   background-color: #1975bc;
   border: 1px darken(#1975bc, 10%) solid;
   text-shadow: 0 1px 0 darken(#1975bc, 12%);
-  font-size: 18px;
+  font-size: 16px;
   font-family: 'Quando', serif;
   font-weight: 300;
   color: #fff;
