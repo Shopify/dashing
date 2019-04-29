@@ -103,6 +103,22 @@ post '/dashboards/:id' do
   end
 end
 
+post '/widgets' do
+  request.body.rewind
+  body = JSON.parse(request.body.read)
+  auth_token = body.delete("auth_token")
+  if !settings.auth_token || settings.auth_token == auth_token
+    body["widgets"].each do |widget|
+      widget_id = widget.delete("id")
+      send_event(widget_id, widget)
+    end
+    204 # response without entity body
+  else
+    status 401
+    "Invalid API key\n"
+  end
+end
+
 post '/widgets/:id' do
   request.body.rewind
   body = JSON.parse(request.body.read)
